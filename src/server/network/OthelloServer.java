@@ -15,18 +15,17 @@ public class OthelloServer {
 		int clientId = 0;
 		System.out.println("The Server has launched!");
 
-		try {
-			try (ServerSocket server = new ServerSocket(10000)) {
-				while (true) {
-					Socket socket = server.accept();
-					System.out.println("Accept client No." + clientId);
-					clientId++;
-					InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
-					BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-					PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-					ClientProcessThread client = new ClientProcessThread(clientId, bufferedReader,printWriter);
-					clients.put(clientId, client);
-				}
+		try (ServerSocket server = new ServerSocket(10000)) {
+
+			while (true) {
+				Socket socket = server.accept();
+				System.out.println("Accept client No." + clientId);
+				clientId++;
+				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
+				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+				PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+				ClientProcessThread client = new ClientProcessThread(clientId, bufferedReader,printWriter);
+				clients.put(clientId, client);
 			}
 
 		} catch (Exception e) {
