@@ -22,7 +22,7 @@ public class Board {
 
 		Cell cell = this.getCell(i, j);
 		if (cell.hasCoin()) {
-			return;
+			return; // todo: また後で何とか考える.
 		}
 		cell.setCellStatus(myCellStatus);
 
@@ -46,14 +46,15 @@ public class Board {
 //				=========== それぞれのセルについて処理を行う部分 ===========
 				cell = this.getCell(i_dash, j_dash);
 
-				if (cell.getCellStatus() == myCellStatus) {
+				if (cell.getCellStatus() == opponentCellStatus) {
+					cells.add(cell);
+
+				} else if (cell.getCellStatus() == myCellStatus) {
 					for (Cell c: cells) {
 						c.setCellStatus(myCellStatus);
 					}
 					break;
 
-				} else if (cell.getCellStatus() == opponentCellStatus) {
-					cells.add(cell);
 				} else {
 					break;
 				}
