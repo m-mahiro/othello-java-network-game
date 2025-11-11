@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
-public class ClientProcessThread {
+public class ClientProcessThread extends Thread{
 
 	public int clientId;
 	public String name;
