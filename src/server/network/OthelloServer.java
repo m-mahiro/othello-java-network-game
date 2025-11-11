@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class OthelloServer {
 	final private static int maxConnection = 100;
