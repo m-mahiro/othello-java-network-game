@@ -12,7 +12,7 @@ public class OthelloServer {
 	final private static int maxConnection = 100;
 	private static HashMap<Integer, ClientProcessThread> clients = new HashMap<>();
 
-	public static void main(String args) {
+	public static void main(String[] args) {
 		int clientId = 0;
 		System.out.println("The Server has launched!");
 
