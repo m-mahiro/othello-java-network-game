@@ -2,7 +2,6 @@ package server.network;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 public class ClientProcessThread extends Thread{
@@ -13,23 +12,39 @@ public class ClientProcessThread extends Thread{
 	private PrintWriter out;
 
 
-	ClientProcessThread(int clientId, BufferedReader in, PrintWriter out) {
+	ClientProcessThread(int clientId, BufferedReader in, PrintWriter out, String clientName) {
 		this.clientId = clientId;
+		this.in = in;
 		this.out = out;
 	}
 
 	public void run() {
 		try {
-			out.println("Hello, client No." + this.clientId + "! Enter 'Bye' to exit.");
+			send("Hello, client No." + this.clientId + "!");
 
 			while(true) {
-				String str = in.readLine();
-				System.out.println("Received from client No." + this.clientId + "(" + this.name + "), Messages: " + str);
+				String message = this.waitMessage();
+				if (message == null) break;
+				MessageServer.sendAll(message, this);
 			}
 
 		} catch (Exception e) {
-			OthelloServer.terminateClientProcess(this);
+			MessageServer.terminateClientProcess(this, e);
+			throw new RuntimeException(e);
 		}
+	}
+
+	public void send(String str) {
+		out.println(str);
+		out.flush();
+		System.out.println("Srv->" + clientId + ": " + str);
+	}
+
+	public String waitMessage() throws Exception {
+		String message = in.readLine();
+		if (message == null) return null;
+		System.out.println(this.clientId + "->Srv: " + message);
+		return message;
 	}
 
 }
