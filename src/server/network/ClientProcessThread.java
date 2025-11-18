@@ -1,26 +1,26 @@
 package server.network;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 
 public class ClientProcessThread extends Thread{
 
-	public int clientId;
+	public int id;
 	public String name;
 	private BufferedReader in;
 	private PrintWriter out;
 
 
-	ClientProcessThread(int clientId, BufferedReader in, PrintWriter out, String clientName) {
-		this.clientId = clientId;
+	ClientProcessThread(int id, BufferedReader in, PrintWriter out, String clientName) {
+		this.id = id;
 		this.in = in;
 		this.out = out;
+		this.name = clientName;
 	}
 
 	public void run() {
 		try {
-			send("Hello, client No." + this.clientId + "!");
+			send("Hello, client No." + this.id + "!");
 
 			while(true) {
 				String message = this.waitMessage();
@@ -37,13 +37,13 @@ public class ClientProcessThread extends Thread{
 	public void send(String str) {
 		out.println(str);
 		out.flush();
-		System.out.println("Srv->" + clientId + ": " + str);
+		System.out.println("Srv->" + id + ": " + str);
 	}
 
 	public String waitMessage() throws Exception {
 		String message = in.readLine();
 		if (message == null) return null;
-		System.out.println(this.clientId + "->Srv: " + message);
+		System.out.println(this.id + "->Srv: " + message);
 		return message;
 	}
 

@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 public class MessageServer {
 	final private static int maxConnection = 100;
@@ -39,7 +38,7 @@ public class MessageServer {
 
 
 	public static void sendAll(String str, ClientProcessThread sender) {
-		System.out.println("Broadcast(" + sender.clientId + "->*) : " + str);
+		System.out.println("Broadcast(" + sender.id + "->*) : " + str);
 		for (ClientProcessThread client : clients.values()) {
 			System.out.print("    ");
 			client.send(str);
@@ -49,8 +48,8 @@ public class MessageServer {
 
 
 	public static void terminateClientProcess(ClientProcessThread client, Exception e) {
-		System.out.println("Disconnect from client No."+client.clientId+"("+client.name+")");
-		clients.remove(client.clientId);
+		System.out.println("Disconnect from client No."+client.id +"("+client.name+")");
+		clients.remove(client.id);
 	}
 
 //	todo: clientIdが枯渇したときの話。
