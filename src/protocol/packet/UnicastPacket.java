@@ -1,6 +1,6 @@
 package protocol.packet;
 
-import protocol.message.Message;
+import protocol.message.*;
 
 public final class UnicastPacket implements Packet{
 
@@ -45,14 +45,14 @@ public final class UnicastPacket implements Packet{
 		}
 		String bodyString = packetString.substring(bodyIndex + 1);
 
-		return new UnicastPacket(source, destination, new Message(bodyString));
+		return new UnicastPacket(source, destination, new BasicMessage(bodyString));
 	}
 
 	public String generatePacketString() {
 		String str = "";
-		str += UnicastPacket.type.toString();
-		str += this.source;
-		str += this.destination;
+		str += UnicastPacket.type.toString() + " ";
+		str += this.source + " ";
+		str += this.destination + " ";
 		str += body.toString();
 		return str;
 	}
