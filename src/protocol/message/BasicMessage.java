@@ -2,28 +2,32 @@ package protocol.message;
 
 public final class BasicMessage implements Message {
 
-	private final MessageType type;
-	private final String content;
+	public static final MessageType type = MessageType.BASIC;
+	public final String content;
 
 	public BasicMessage(String content) {
-		this.type = MessageType.BASIC;
 		this.content = content;
 	}
 
-	public BasicMessage parseMessage(String contentString) {
-		return new BasicMessage(contentString);
-	}
+	public static BasicMessage parseMessage(String messageString) {
+		String[] args = messageString.split(" ");
+		MessageType type;
+		String content;
 
-	public MessageType getType() {
-		return this.type;
-	}
+		// メッセージタイプのエラーハンドリング
+		try {
+			type = MessageType.valueOf(args[0]);
+			if (type != BasicMessage.type) throw MessageException.illegalMessageType(type);
+		} catch (IllegalArgumentException e) {
+			throw MessageException.noSuchMessageType(args[0]);
+		}
 
-	public String getContent() {
-		return content;
+		content = args[1];
+		return new BasicMessage(content);
 	}
 
 	public String generateMessageString() {
-		return this.getType() + " " + this.getContent();
+		return BasicMessage.type.toString() + " " + this.content;
 	}
 
 }
