@@ -26,7 +26,7 @@ public final class BasicMessage implements Message {
 		return new BasicMessage(content);
 	}
 
-	public String generateMessageString() {
+	public String toString() {
 		return BasicMessage.type.toString() + " " + this.content;
 	}
 

@@ -6,9 +6,9 @@ public final class UnicastPacket implements Packet{
 
 	public static final int headerArgs = 3;
 	public static final PacketType type = PacketType.UNICAST;
-	private final int source;
-	private final int destination;
-	private final Message body;
+	public final int source;
+	public final int destination;
+	public final Message body;
 
 	public UnicastPacket(int source, int destination, Message body) {
 		this.source = source;
@@ -48,7 +48,7 @@ public final class UnicastPacket implements Packet{
 		return new UnicastPacket(source, destination, new BasicMessage(bodyString));
 	}
 
-	public String generatePacketString() {
+	public String toString() {
 		String str = "";
 		str += UnicastPacket.type.toString() + " ";
 		str += this.source + " ";
@@ -57,17 +57,5 @@ public final class UnicastPacket implements Packet{
 		return str;
 	}
 
-	// ============== ゲッターメソッド ==============
-	public int getSource() {
-		return this.source;
-	}
-
-	public int getDestination() {
-		return this.destination;
-	}
-
-	public Message getBody() {
-		return this.body;
-	}
 
 }

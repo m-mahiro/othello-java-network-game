@@ -1,14 +1,17 @@
 package server.network;
 
+import protocol.message.BasicMessage;
+import protocol.packet.UnicastPacket;
+
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 
 public class ClientProcessThread extends Thread{
 
-	public int id;
+	public final int id;
 	public String name;
-	private BufferedReader in;
-	private PrintWriter out;
+	private final BufferedReader in;
+	private final PrintWriter out;
 
 
 	ClientProcessThread(int id, BufferedReader in, PrintWriter out, String clientName) {
@@ -34,8 +37,10 @@ public class ClientProcessThread extends Thread{
 		}
 	}
 
-	public void send(String str) {
-		out.println(str);
+	public void send(ClientProcessThread client, String str) {
+		BasicMessage message = new BasicMessage(str);
+		UnicastPacket packet = new UnicastPacket(client.id, this.id, message);
+		out.println(packet);
 		out.flush();
 		System.out.println("Srv->" + id + ": " + str);
 	}
