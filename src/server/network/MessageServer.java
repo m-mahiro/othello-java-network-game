@@ -65,7 +65,7 @@ public class MessageServer {
 	}
 
 	public static void send(Message message, int destination) {
-		UnicastPacket packet = new UnicastPacket(0, destination, message); // 0はサーバのアドレス
+		UnicastPacket packet = new UnicastPacket(SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
 		MessageServer.forward(packet);
 	}
 
