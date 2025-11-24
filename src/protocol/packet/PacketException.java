@@ -14,4 +14,8 @@ public class PacketException extends RuntimeException {
 		return new PacketException("Invalid header format: " + PacketString);
 	}
 
+	public static PacketException unsupportedPacketType(PacketType type) {
+		return new PacketException("Unsupported packet type: " + type);
+	}
+
 }

@@ -30,7 +30,7 @@ public interface Packet {
 				UnicastPacket unicastPacket = (UnicastPacket) packet;
 				return unicastPacket.destination == address;
 		}
-		throw new RuntimeException("想定外のパケットタイプ");
+		throw PacketException.unsupportedPacketType(packet.getType());
 	}
 
 }
