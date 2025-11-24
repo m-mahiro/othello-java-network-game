@@ -10,12 +10,12 @@ public class PacketException extends RuntimeException {
 		return new PacketException("No such packet type: " + packetString); // todo: 英語がおかしい
 	}
 
-	public static PacketException invalidHeaderFormat(String PacketString) {
-		return new PacketException("Invalid header format: " + PacketString);
+	public static PacketException invalidHeaderFormat(String packetString) {
+		return new PacketException("Invalid header format: " + packetString);
 	}
 
-	public static PacketException unsupportedPacketType(PacketType type) {
-		return new PacketException("Unsupported packet type: " + type);
+	public static PacketException unsupportedPacketType(String packetString) {
+		return new PacketException("Unsupported packet type: " + packetString);
 	}
 
 }
