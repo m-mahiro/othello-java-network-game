@@ -50,7 +50,7 @@ public class MessageServerProcess extends Thread {
 						throw PacketException.noSuchPacketType(packetString); // todo: 違うエラー内容の方が良いかな?
 				}
 
-				System.out.println("[ClientProcessThread] " + message.getMessageString());
+				System.out.println("[MessageServerProcess] " + message.getMessageString());
 			}
 
 		} catch (Exception e) {
@@ -62,7 +62,7 @@ public class MessageServerProcess extends Thread {
 	public void push(Packet packet) {
 		out.println(packet);
 		out.flush();
-		System.out.println("[ClientProcessThread] " + packet);
+		System.out.println("[MessageServerProcess] " + packet);
 	}
 
 }

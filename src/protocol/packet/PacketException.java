@@ -10,7 +10,7 @@ public class PacketException extends RuntimeException {
 		return new PacketException("No such packet type: " + packetString); // todo: 英語がおかしい
 	}
 
-	public static PacketException invalidHeaderFormat(String PacketString) {
+	public static PacketException invalidPacketFormat(String PacketString) {
 		return new PacketException("Invalid header format: " + PacketString);
 	}
 

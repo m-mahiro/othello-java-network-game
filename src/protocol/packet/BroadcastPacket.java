@@ -18,7 +18,7 @@ public class BroadcastPacket implements Packet {
 	public static BroadcastPacket parse(String packetString) {
 
 		if (Packet.getTypeFrom(packetString) != BroadcastPacket.type) {
-			throw PacketException.invalidHeaderFormat(packetString);
+			throw PacketException.invalidPacketFormat(packetString);
 		}
 
 		// ヘッダーの各要素を取得する
@@ -47,7 +47,7 @@ public class BroadcastPacket implements Packet {
 			}
 		}
 		if (count != headerSize) {
-			throw PacketException.invalidHeaderFormat(packetString) ;
+			throw PacketException.invalidPacketFormat(packetString) ;
 		}
 		String bodyString = packetString.substring(bodyIndex + 1);
 
