@@ -24,6 +24,11 @@ public class ParsingUtil {
 			throw new IllegalArgumentException("headerSize cannot be negative");
 		}
 		
+		// Special case: headerSize is 0 means no header, entire string is body
+		if (headerSize == 0) {
+			return inputString;
+		}
+		
 		char[] charArray = inputString.toCharArray();
 		int count = 0;
 		int bodyIndex = -1;
