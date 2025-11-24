@@ -23,7 +23,15 @@ public class BroadcastPacket implements Packet {
 
 		// ヘッダーの各要素を取得する
 		String[] args = packetString.split(" ");
-		int source = Integer.parseInt(args[1]);
+		if (args.length <= 1) {
+			throw PacketException.invalidHeaderFormat(packetString);
+		}
+		int source;
+		try {
+			source = Integer.parseInt(args[1]);
+		} catch (NumberFormatException e) {
+			throw PacketException.invalidHeaderFormat(packetString);
+		}
 
 		// bodyの文字列を取得する todo: この処理は各パケットクラスで重複しています。
 		char[] charArray = packetString.toCharArray();
