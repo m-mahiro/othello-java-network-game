@@ -8,7 +8,7 @@ public class BroadcastPacket implements Packet {
 	public final Message body;
 
 	private static final PacketType type = PacketType.BROADCAST;
-	private static final int headerArgs = 2;
+	private static final int headerSize = 2;
 
 	public BroadcastPacket(int source, Message body) {
 		this.source = source;
@@ -16,6 +16,7 @@ public class BroadcastPacket implements Packet {
 	}
 
 	public static BroadcastPacket parse(String packetString) {
+
 		if (Packet.getTypeFrom(packetString) != BroadcastPacket.type) {
 			throw PacketException.invalidHeaderFormat(packetString);
 		}
@@ -24,7 +25,7 @@ public class BroadcastPacket implements Packet {
 		String[] args = packetString.split(" ");
 		int source = Integer.parseInt(args[1]);
 
-		// bodyの文字列を取得する
+		// bodyの文字列を取得する todo: この処理は各パケットクラスで重複しています。
 		char[] charArray = packetString.toCharArray();
 		int count = 0;
 		int bodyIndex = -1;
@@ -32,18 +33,20 @@ public class BroadcastPacket implements Packet {
 			if (charArray[i] == ' ') {
 				count++;
 			}
-			if (count == headerArgs) {
+			if (count == headerSize) {
 				bodyIndex = i;
 				break;
 			}
 		}
-		if (count != headerArgs) {
+		if (count != headerSize) {
 			throw PacketException.invalidHeaderFormat(packetString) ;
 		}
 		String bodyString = packetString.substring(bodyIndex + 1);
 
-		return new BroadcastPacket(source, new BasicMessage(bodyString));
-		// todo: BasicMessage以外のメソッドが生まれたら、↑をなんとかする
+		// bodyStringをMessageオブジェクト化する
+		Message message = Message.parse(bodyString);
+
+		return new BroadcastPacket(source, message);
 	}
 
 	public PacketType getType() {
@@ -54,9 +57,14 @@ public class BroadcastPacket implements Packet {
 	public String getPacketString() {
 		String str = "";
 		str += BroadcastPacket.type + " ";
-		str += this.source;
+		str += this.source + " ";
 		str += this.body.getMessageString();
 		return str;
+	}
+
+	@Override
+	public Message getBody() {
+		return body;
 	}
 
 	@Override

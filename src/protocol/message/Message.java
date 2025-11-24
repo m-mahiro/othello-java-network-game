@@ -14,4 +14,17 @@ public interface Message {
 	}
 
 	MessageType getType();
+
+	static Message parse(String bodyString){
+		Message message;
+		MessageType messageType = Message.getTypeFrom(bodyString);
+		switch (messageType) {
+			case BASIC:
+				message = BasicMessage.parse(bodyString);
+				break;
+			default:
+				throw MessageException.noSuchMessageType(bodyString); // todo: 違うエラー内容の方が良いかな?
+		}
+		return message;
+	}
 }

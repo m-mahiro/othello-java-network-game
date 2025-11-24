@@ -9,7 +9,7 @@ public class UnicastPacket implements Packet {
 	public final Message body;
 
 	private static final PacketType type = PacketType.UNICAST;
-	private static final int headerArgs = 3;
+	private static final int headerSize = 3;
 
 	public UnicastPacket(int source, int destination, Message body) {
 		this.source = source;
@@ -28,7 +28,7 @@ public class UnicastPacket implements Packet {
 		int source = Integer.parseInt(args[1]);
 		int destination = Integer.parseInt(args[2]);
 
-		// bodyの文字列を取得する
+		// bodyの文字列を取得する todo: この処理は各パケットクラスで重複しています。
 		char[] charArray = packetString.toCharArray();
 		int count = 0;
 		int bodyIndex = -1;
@@ -36,23 +36,30 @@ public class UnicastPacket implements Packet {
 			if (charArray[i] == ' ') {
 				count++;
 			}
-			if (count == headerArgs) {
+			if (count == headerSize) {
 				bodyIndex = i;
 				break;
 			}
 		}
-		if (count != headerArgs) {
+		if (count != headerSize) {
 			throw PacketException.invalidHeaderFormat(packetString) ;
 		}
 		String bodyString = packetString.substring(bodyIndex + 1);
 
-		return new UnicastPacket(source, destination, new BasicMessage(bodyString));
-		// todo: BasicMessage以外のメソッドが生まれたら、↑をなんとかする
+		// bodyStringをMessageオブジェクト化する
+		Message message = Message.parse(bodyString);
+
+		return new UnicastPacket(source, destination, message);
 	}
 
 	@Override
 	public PacketType getType() {
 		return UnicastPacket.type;
+	}
+
+	@Override
+	public Message getBody() {
+		return body;
 	}
 
 	@Override

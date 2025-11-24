@@ -1,9 +1,13 @@
 package protocol.message;
 
+import protocol.packet.PacketException;
+
 public final class BasicMessage implements Message {
 
 	public static final MessageType type = MessageType.BASIC;
 	public final String content;
+
+	private static final int headerSize = 1;
 
 	public BasicMessage(String content) {
 		this.content = content;
@@ -22,7 +26,23 @@ public final class BasicMessage implements Message {
 			throw MessageException.noSuchMessageType(args[0]);
 		}
 
-		content = args[1];
+		char[] charArray = messageString.toCharArray();
+		int count = 0;
+		int bodyIndex = -1;
+		for (int i = 0; i < charArray.length; i++) {
+			if (charArray[i] == ' ') {
+				count++;
+			}
+			if (count == headerSize) {
+				bodyIndex = i;
+				break;
+			}
+		}
+		if (count != headerSize) {
+			throw PacketException.invalidHeaderFormat(messageString) ;
+		}
+		content = messageString.substring(bodyIndex + 1);
+
 		return new BasicMessage(content);
 	}
 

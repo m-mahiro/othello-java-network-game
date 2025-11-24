@@ -1,10 +1,16 @@
 package protocol.packet;
 
-import server.network.ClientProcessThread;
+import protocol.message.Message;
+import server.network.MessageServerProcess;
 
 public interface Packet {
 
 	String getPacketString();
+
+
+	PacketType getType();
+
+	Message getBody();
 
 	static PacketType getTypeFrom(String packetString) {
 		String[] args = packetString.split(" ");
@@ -15,16 +21,14 @@ public interface Packet {
 		}
 	}
 
-	PacketType getType();
-
-	static boolean compareAddress(Packet packet, ClientProcessThread me) {
+	static boolean compareAddress(Packet packet, MessageServerProcess serverThread) {
 		switch (packet.getType()) {
 			case BROADCAST:
 				return false;
 			case UNICAST:
 				assert packet instanceof UnicastPacket;
 				UnicastPacket unicastPacket = (UnicastPacket) packet;
-				return unicastPacket.destination == me.id;
+				return unicastPacket.destination == serverThread.id;
 		}
 		throw new RuntimeException("想定外のパケットタイプ");
 	}

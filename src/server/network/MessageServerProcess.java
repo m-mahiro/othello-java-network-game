@@ -6,7 +6,7 @@ import protocol.packet.*;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 
-public class ClientProcessThread extends Thread {
+public class MessageServerProcess extends Thread {
 
 	public final int id;
 	public String name;
@@ -14,7 +14,7 @@ public class ClientProcessThread extends Thread {
 	private final PrintWriter out;
 
 
-	ClientProcessThread(int id, BufferedReader in, PrintWriter out, String clientName) {
+	MessageServerProcess(int id, BufferedReader in, PrintWriter out, String clientName) {
 		this.id = id;
 		this.in = in;
 		this.out = out;
@@ -47,22 +47,22 @@ public class ClientProcessThread extends Thread {
 						MessageServer.forward(broadcastPacket);
 						continue;
 					default:
-						throw PacketException.noSuchPacketType(packetString);
+						throw PacketException.noSuchPacketType(packetString); // todo: 違うエラー内容の方が良いかな?
 				}
 
-				System.out.println(message.getMessageString());
+				System.out.println("[ClientProcessThread] " + message.getMessageString());
 			}
 
 		} catch (Exception e) {
-			MessageServer.terminateClientProcess(this, e);
+//			MessageServer.terminateClientProcess(this, e);
 			throw new RuntimeException(e); // todo: ちゃんと定義したExceptionを使わないといけない
 		}
 	}
 
-	public void send(Packet packet) {
+	public void push(Packet packet) {
 		out.println(packet);
 		out.flush();
-		System.out.println(packet);
+		System.out.println("[ClientProcessThread] " + packet);
 	}
 
 }
