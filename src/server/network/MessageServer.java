@@ -13,24 +13,24 @@ import java.util.HashMap;
 public class MessageServer {
 	final private static int maxConnection = 100;
 	private static final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
-	private static final int CLIENT_ID_FOR_SERVER = 0;
+	private static final int SERVER_ADDRESS = 0;
 
 	public static void main(String[] args) {
-		int clientId = 0;
+		int address = 0;
 		System.out.println("[MessageServer] " + "The Server has launched!");
 
 		try (ServerSocket server = new ServerSocket(10000)) {
 
 			while (true) {
 				Socket socket = server.accept();
-				System.out.println("[MessageServer] " + "Accept client No." + clientId);
-				clientId++;
+				System.out.println("[MessageServer] " + "Accept client No." + address);
+				address++;
 				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 				BufferedReader in = new BufferedReader(inputStreamReader);
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				String clientName = in.readLine(); // 接続して初めの一行はclientName todo: 気に入らない
-				MessageServerProcess client = new MessageServerProcess(clientId, in, out, clientName);
-				clients.put(clientId, client);
+				MessageServerProcess client = new MessageServerProcess(address, in, out, clientName);
+				clients.put(address, client);
 				client.start();
 			}
 
@@ -41,7 +41,7 @@ public class MessageServer {
 	}
 
 	public static void forward(UnicastPacket packet) {
-		if (packet.destination == CLIENT_ID_FOR_SERVER) {
+		if (packet.destination == SERVER_ADDRESS) {
 			System.out.println("[MessageServer] " + packet.getPacketString());
 			// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
 			return;
@@ -59,15 +59,15 @@ public class MessageServer {
 	}
 
 	public static void send(Message message, int destination) {
-		UnicastPacket packet = new UnicastPacket(0, destination, message); // 0はサーバのクライアントID
+		UnicastPacket packet = new UnicastPacket(0, destination, message); // 0はサーバのアドレス
 		MessageServer.forward(packet);
 	}
 
 	public static void terminateClientProcess(MessageServerProcess client, Exception e) {
-		System.out.println("[MessageServer] " + "Disconnect from client No."+client.id +"("+client.name+")");
-		clients.remove(client.id);
+		System.out.println("[MessageServer] " + "Disconnect from client No."+client.address +"("+client.name+")");
+		clients.remove(client.address);
 	}
 
-//	todo: clientIdが枯渇したときの話。
+//	todo: アドレスが枯渇したときの話。
 
 }

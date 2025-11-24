@@ -15,11 +15,12 @@ public class MessageClient extends Thread {
 
 	private BufferedReader in;
 	private PrintWriter out;
-	public final int id = 1;
+	public final int address = 1;
 
 	public MessageClient(String clientName) {
 		try {
 			// 通信路の確立
+			@SuppressWarnings("resource")
 			Socket socket = new Socket("localhost", 10000);
 			InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 			this.in = new BufferedReader(inputStreamReader);
@@ -27,10 +28,10 @@ public class MessageClient extends Thread {
 
 			// clientNameをサーバに送信する
 			BasicMessage message = new BasicMessage(clientName);
-			UnicastPacket packet = new UnicastPacket(this.id, 0, message);
+			UnicastPacket packet = new UnicastPacket(this.address, 0, message);
 			this.transport(packet); // 接続して初めの一行はclientName todo: 気に入らない
 
-			// clientIdの通知を受ける
+			// アドレスの通知を受ける
 			Message helloMessage = this.waitMessage(); // "Hello, client No.1!" を受け取る
 			System.out.println("[MessageClientThread] " + helloMessage);
 
@@ -65,12 +66,12 @@ public class MessageClient extends Thread {
 	}
 
 	public void broadcast(Message message) {
-		BroadcastPacket packet = new BroadcastPacket(this.id, message);
+		BroadcastPacket packet = new BroadcastPacket(this.address, message);
 		transport(packet);
 	}
 
 	public void send(int destination, Message message) {
-		UnicastPacket packet = new UnicastPacket(this.id, destination, message);
+		UnicastPacket packet = new UnicastPacket(this.address, destination, message);
 		transport(packet);
 	}
 

@@ -8,14 +8,14 @@ import java.io.PrintWriter;
 
 public class MessageServerProcess extends Thread {
 
-	public final int id;
+	public final int address;
 	public String name;
 	private final BufferedReader in;
 	private final PrintWriter out;
 
 
-	MessageServerProcess(int id, BufferedReader in, PrintWriter out, String clientName) {
-		this.id = id;
+	MessageServerProcess(int address, BufferedReader in, PrintWriter out, String clientName) {
+		this.address = address;
 		this.in = in;
 		this.out = out;
 		this.name = clientName;
@@ -23,8 +23,8 @@ public class MessageServerProcess extends Thread {
 
 	public void run() {
 		try {
-			BasicMessage helloMessage = new BasicMessage("Hello, client No." + this.id + "!");
-			MessageServer.send(helloMessage, this.id);
+			BasicMessage helloMessage = new BasicMessage("Hello, client No." + this.address + "!");
+			MessageServer.send(helloMessage, this.address);
 
 			while (true) {
 				Message message;
@@ -35,7 +35,7 @@ public class MessageServerProcess extends Thread {
 				switch (Packet.getTypeFrom(packetString)) {
 					case UNICAST:
 						UnicastPacket unicastPacket = UnicastPacket.parse(packetString);
-						if (Packet.compareAddress(unicastPacket, this)) {
+						if (Packet.compareAddress(unicastPacket, this.address)) {
 							message = unicastPacket.body;
 						} else {
 							MessageServer.forward(unicastPacket);
