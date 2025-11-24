@@ -33,13 +33,16 @@ public final class BasicMessage implements Message {
 	}
 
 	@Override
-	public MessageType getType() {
-		return BasicMessage.type;
+	public String getMessageString() {
+		String str = "";
+		str += BasicMessage.type.toString() + " ";
+		str += this.content;
+		return str;
 	}
 
 	@Override
-	public String getMessageString() {
-		return BasicMessage.type.toString() + " " + this.content;
+	public MessageType getType() {
+		return BasicMessage.type;
 	}
 
 	@Override

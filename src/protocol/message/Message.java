@@ -4,6 +4,8 @@ public interface Message {
 
 	String getMessageString();
 
+	MessageType getType();
+
 	static MessageType getTypeFrom(String messageString) {
 		String[] args = messageString.split(" ");
 		try {
@@ -12,8 +14,6 @@ public interface Message {
 			throw MessageException.noSuchMessageType(messageString);
 		}
 	}
-
-	MessageType getType();
 
 	static Message parse(String bodyString){
 		Message message;
