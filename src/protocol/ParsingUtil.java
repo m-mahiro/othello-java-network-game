@@ -14,8 +14,16 @@ public class ParsingUtil {
 	 * @param headerSize The number of space-separated header fields before the body
 	 * @return The body string after the header fields
 	 * @throws PacketException if the header format is invalid (not enough fields)
+	 * @throws IllegalArgumentException if inputString is null or headerSize is negative
 	 */
 	public static String extractBody(String inputString, int headerSize) {
+		if (inputString == null) {
+			throw new IllegalArgumentException("inputString cannot be null");
+		}
+		if (headerSize < 0) {
+			throw new IllegalArgumentException("headerSize cannot be negative");
+		}
+		
 		char[] charArray = inputString.toCharArray();
 		int count = 0;
 		int bodyIndex = -1;
