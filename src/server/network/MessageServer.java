@@ -19,8 +19,10 @@ public class MessageServer {
 		int address = 0;
 		System.out.println("[MessageServer] " + "The Server has launched!");
 
-		try (ServerSocket server = new ServerSocket(10000)) {
+		try {
 
+			@SuppressWarnings("resource")
+			ServerSocket server = new ServerSocket(10000);
 			while (true) {
 				Socket socket = server.accept();
 				System.out.println("[MessageServer] " + "Accept client No." + address);
