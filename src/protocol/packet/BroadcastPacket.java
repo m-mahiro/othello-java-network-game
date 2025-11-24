@@ -1,5 +1,6 @@
 package protocol.packet;
 
+import protocol.ParsingUtil;
 import protocol.message.*;
 
 public class BroadcastPacket implements Packet {
@@ -25,23 +26,8 @@ public class BroadcastPacket implements Packet {
 		String[] args = packetString.split(" ");
 		int source = Integer.parseInt(args[1]);
 
-		// bodyの文字列を取得する todo: この処理は各パケットクラスで重複しています。
-		char[] charArray = packetString.toCharArray();
-		int count = 0;
-		int bodyIndex = -1;
-		for (int i = 0; i < charArray.length; i++) {
-			if (charArray[i] == ' ') {
-				count++;
-			}
-			if (count == headerSize) {
-				bodyIndex = i;
-				break;
-			}
-		}
-		if (count != headerSize) {
-			throw PacketException.invalidHeaderFormat(packetString) ;
-		}
-		String bodyString = packetString.substring(bodyIndex + 1);
+		// bodyの文字列を取得する
+		String bodyString = ParsingUtil.extractBody(packetString, headerSize);
 
 		// bodyStringをMessageオブジェクト化する
 		Message message = Message.parse(bodyString);

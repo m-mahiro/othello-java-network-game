@@ -1,5 +1,6 @@
 package protocol.message;
 
+import protocol.ParsingUtil;
 import protocol.packet.PacketException;
 
 public final class BasicMessage implements Message {
@@ -26,22 +27,7 @@ public final class BasicMessage implements Message {
 			throw MessageException.noSuchMessageType(args[0]);
 		}
 
-		char[] charArray = messageString.toCharArray();
-		int count = 0;
-		int bodyIndex = -1;
-		for (int i = 0; i < charArray.length; i++) {
-			if (charArray[i] == ' ') {
-				count++;
-			}
-			if (count == headerSize) {
-				bodyIndex = i;
-				break;
-			}
-		}
-		if (count != headerSize) {
-			throw PacketException.invalidHeaderFormat(messageString) ;
-		}
-		content = messageString.substring(bodyIndex + 1);
+		content = ParsingUtil.extractBody(messageString, headerSize);
 
 		return new BasicMessage(content);
 	}
