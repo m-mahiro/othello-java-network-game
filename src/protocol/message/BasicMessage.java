@@ -9,7 +9,7 @@ public final class BasicMessage implements Message {
 		this.content = content;
 	}
 
-	public static BasicMessage parseMessage(String messageString) {
+	public static BasicMessage parse(String messageString) {
 		String[] args = messageString.split(" ");
 		MessageType type;
 		String content;
@@ -26,8 +26,18 @@ public final class BasicMessage implements Message {
 		return new BasicMessage(content);
 	}
 
-	public String toString() {
+	@Override
+	public MessageType getType() {
+		return BasicMessage.type;
+	}
+
+	@Override
+	public String getMessageString() {
 		return BasicMessage.type.toString() + " " + this.content;
 	}
 
+	@Override
+	public String toString() {
+		return getMessageString();
+	}
 }

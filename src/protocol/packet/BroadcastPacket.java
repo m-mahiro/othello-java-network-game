@@ -2,31 +2,27 @@ package protocol.packet;
 
 import protocol.message.*;
 
-public class UnicastPacket implements Packet {
+public class BroadcastPacket implements Packet {
 
 	public final int source;
-	public final int destination;
 	public final Message body;
 
-	private static final PacketType type = PacketType.UNICAST;
-	private static final int headerArgs = 3;
+	private static final PacketType type = PacketType.BROADCAST;
+	private static final int headerArgs = 2;
 
-	public UnicastPacket(int source, int destination, Message body) {
+	public BroadcastPacket(int source, Message body) {
 		this.source = source;
-		this.destination = destination;
 		this.body = body;
 	}
 
-	public static UnicastPacket parse(String packetString) {
-
-		if(!packetString.startsWith(UnicastPacket.type.toString() + " ")) {
+	public static BroadcastPacket parse(String packetString) {
+		if (Packet.getTypeFrom(packetString) != BroadcastPacket.type) {
 			throw PacketException.invalidHeaderFormat(packetString);
 		}
 
 		// ヘッダーの各要素を取得する
-		String[] args =  packetString.split(" ");
+		String[] args = packetString.split(" ");
 		int source = Integer.parseInt(args[1]);
-		int destination = Integer.parseInt(args[2]);
 
 		// bodyの文字列を取得する
 		char[] charArray = packetString.toCharArray();
@@ -46,22 +42,20 @@ public class UnicastPacket implements Packet {
 		}
 		String bodyString = packetString.substring(bodyIndex + 1);
 
-		return new UnicastPacket(source, destination, new BasicMessage(bodyString));
+		return new BroadcastPacket(source, new BasicMessage(bodyString));
 		// todo: BasicMessage以外のメソッドが生まれたら、↑をなんとかする
 	}
 
-	@Override
 	public PacketType getType() {
-		return UnicastPacket.type;
+		return BroadcastPacket.type;
 	}
 
 	@Override
 	public String getPacketString() {
 		String str = "";
-		str += UnicastPacket.type.toString() + " ";
-		str += this.source + " ";
-		str += this.destination + " ";
-		str += body.getMessageString();
+		str += BroadcastPacket.type + " ";
+		str += this.source;
+		str += this.body.getMessageString();
 		return str;
 	}
 

@@ -1,12 +1,12 @@
 package server.network;
 
-import protocol.message.BasicMessage;
-import protocol.packet.UnicastPacket;
+import protocol.message.*;
+import protocol.packet.*;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 
-public class ClientProcessThread extends Thread{
+public class ClientProcessThread extends Thread {
 
 	public final int id;
 	public String name;
@@ -23,33 +23,46 @@ public class ClientProcessThread extends Thread{
 
 	public void run() {
 		try {
-			send("Hello, client No." + this.id + "!");
+			BasicMessage helloMessage = new BasicMessage("Hello, client No." + this.id + "!");
+			MessageServer.send(helloMessage, this.id);
 
-			while(true) {
-				String message = this.waitMessage();
-				if (message == null) break;
-				MessageServer.sendAll(message, this);
+			while (true) {
+				Message message;
+
+				// メッセージを待つ
+				String packetString = in.readLine(); // todo: IOExceptionをキャッチする?
+				if (packetString == null) break; // ストリームラインの最後
+				switch (Packet.getTypeFrom(packetString)) {
+					case UNICAST:
+						UnicastPacket unicastPacket = UnicastPacket.parse(packetString);
+						if (Packet.compareAddress(unicastPacket, this)) {
+							message = unicastPacket.body;
+						} else {
+							MessageServer.forward(unicastPacket);
+							continue;
+						}
+						break;
+					case BROADCAST:
+						BroadcastPacket broadcastPacket = BroadcastPacket.parse(packetString);
+						MessageServer.forward(broadcastPacket);
+						continue;
+					default:
+						throw PacketException.noSuchPacketType(packetString);
+				}
+
+				System.out.println(message.getMessageString());
 			}
 
 		} catch (Exception e) {
 			MessageServer.terminateClientProcess(this, e);
-			throw new RuntimeException(e);
+			throw new RuntimeException(e); // todo: ちゃんと定義したExceptionを使わないといけない
 		}
 	}
 
-	public void send(ClientProcessThread client, String str) {
-		BasicMessage message = new BasicMessage(str);
-		UnicastPacket packet = new UnicastPacket(client.id, this.id, message);
+	public void send(Packet packet) {
 		out.println(packet);
 		out.flush();
-		System.out.println("Srv->" + id + ": " + str);
-	}
-
-	public String waitMessage() throws Exception {
-		String message = in.readLine();
-		if (message == null) return null;
-		System.out.println(this.id + "->Srv: " + message);
-		return message;
+		System.out.println(packet);
 	}
 
 }

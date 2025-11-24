@@ -1,5 +1,8 @@
 package server.network;
 
+import protocol.message.Message;
+import protocol.packet.*;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -9,7 +12,8 @@ import java.util.HashMap;
 
 public class MessageServer {
 	final private static int maxConnection = 100;
-	private static HashMap<Integer, ClientProcessThread> clients = new HashMap<>();
+	private static final HashMap<Integer, ClientProcessThread> clients = new HashMap<>();
+	private static final int CLIENT_ID_FOR_SERVER = 0;
 
 	public static void main(String[] args) {
 		int clientId = 0;
@@ -36,16 +40,28 @@ public class MessageServer {
 		}
 	}
 
+	public static void forward(UnicastPacket packet) {
+		if (packet.destination == CLIENT_ID_FOR_SERVER) {
+			System.out.println(packet.getPacketString());
+			// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
+			return;
+		}
+		ClientProcessThread destinationClient = clients.get(packet.destination);
+		destinationClient.send(packet);
+	}
 
-	public static void sendAll(String str, ClientProcessThread sender) {
-		System.out.println("Broadcast(" + sender.id + "->*) : " + str);
+	public static void forward(BroadcastPacket packet) {
+		System.out.println(packet.getPacketString());
+		// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
 		for (ClientProcessThread client : clients.values()) {
-			System.out.print("    ");
-			client.send(str);
+			client.send(packet);
 		}
 	}
 
-
+	public static void send(Message message, int destination) {
+		UnicastPacket packet = new UnicastPacket(0, destination, message); // 0はサーバのクライアントID
+		MessageServer.forward(packet);
+	}
 
 	public static void terminateClientProcess(ClientProcessThread client, Exception e) {
 		System.out.println("Disconnect from client No."+client.id +"("+client.name+")");

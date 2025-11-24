@@ -2,8 +2,12 @@ package protocol.packet;
 
 public class PacketException extends RuntimeException {
 
-	PacketException(String errorMessage) {
+	public PacketException(String errorMessage) {
 		super(errorMessage);
+	}
+
+	public static PacketException noSuchPacketType(String packetString) {
+		return new PacketException("No such packet type: " + packetString); // todo: 英語がおかしい
 	}
 
 	public static PacketException invalidHeaderFormat(String PacketString) {
