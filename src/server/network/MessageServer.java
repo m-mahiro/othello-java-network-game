@@ -47,6 +47,10 @@ public class MessageServer {
 			return;
 		}
 		MessageServerProcess destinationClient = clients.get(packet.destination);
+		if (destinationClient == null) {
+			System.out.println("[MessageServer] Error: Destination client with ID " + packet.destination + " does not exist. Packet not delivered.");
+			return;
+		}
 		destinationClient.push(packet);
 	}
 
