@@ -1,27 +1,29 @@
 package client.controller;
 
 
-import client.network.MessageClientThread;
-import server.network.ClientProcessThread;
+import client.network.MessageClient;
+import protocol.message.*;
+import protocol.packet.*;
 
 import java.util.*;
 
 public class MessageSendStub {
 
 	public static void main(String[] args) {
-		MessageClientThread messageClientThread = new MessageClientThread("test-user");
+		MessageClient messageClient = new MessageClient("test-user");
 
 		Scanner sc = new Scanner(System.in);
 		while (true) {
-			System.out.print("Enter message to send (type 'exit' to quit): ");
+			System.out.print("BroadCast: ");
 			String input = sc.nextLine();
 			if (input.equalsIgnoreCase("exit")) {
 				break;
 			}
-			messageClientThread.send(input);
+			Message message = new BasicMessage(input);
+			Packet packet = new BroadcastPacket(messageClient.address, message);
+			messageClient.transport(packet);
 		}
 		sc.close();
-
 	}
 
 

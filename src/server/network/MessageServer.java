@@ -1,5 +1,8 @@
 package server.network;
 
+import protocol.message.Message;
+import protocol.packet.*;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -9,49 +12,68 @@ import java.util.HashMap;
 
 public class MessageServer {
 	final private static int maxConnection = 100;
-	private static HashMap<Integer, ClientProcessThread> clients = new HashMap<>();
+	private static final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
+	private static final int SERVER_ADDRESS = 0;
 
 	public static void main(String[] args) {
-		int clientId = 0;
-		System.out.println("The Server has launched!");
+		int address = 0;
+		System.out.println("[MessageServer] " + "The Server has launched!");
 
-		try (ServerSocket server = new ServerSocket(10000)) {
+		try {
 
+			@SuppressWarnings("resource")
+			ServerSocket server = new ServerSocket(10000);
 			while (true) {
 				Socket socket = server.accept();
-				System.out.println("Accept client No." + clientId);
-				clientId++;
+				System.out.println("[MessageServer] " + "Accept client No." + address);
+				address++;
 				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 				BufferedReader in = new BufferedReader(inputStreamReader);
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				String clientName = in.readLine(); // 接続して初めの一行はclientName todo: 気に入らない
-				ClientProcessThread client = new ClientProcessThread(clientId, in, out, clientName);
-				clients.put(clientId, client);
+				MessageServerProcess client = new MessageServerProcess(address, in, out, clientName);
+				clients.put(address, client);
 				client.start();
 			}
 
 		} catch (Exception e) {
-			System.out.println("サーバの待ちソケット作成時にエラーが発生しました: " + e);
+			System.out.println("[MessageServer] " + "サーバの待ちソケット作成時にエラーが発生しました: " + e);
 
 		}
 	}
 
+	public static void forward(UnicastPacket packet) {
+		if (packet.destination == SERVER_ADDRESS) {
+			System.out.println("[MessageServer] " + packet.getPacketString());
+			// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
+			return;
+		}
+		MessageServerProcess destinationClient = clients.get(packet.destination);
+		if (destinationClient == null) {
+			System.out.println("[MessageServer] Error: Destination client with ID " + packet.destination + " does not exist. Packet not delivered.");
+			return;
+		}
+		destinationClient.push(packet);
+	}
 
-	public static void sendAll(String str, ClientProcessThread sender) {
-		System.out.println("Broadcast(" + sender.id + "->*) : " + str);
-		for (ClientProcessThread client : clients.values()) {
-			System.out.print("    ");
-			client.send(str);
+	public static void forward(BroadcastPacket packet) {
+		System.out.println("[MessageServer] " + packet.getPacketString());
+		// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
+		for (MessageServerProcess client : clients.values()) {
+			client.push(packet);
 		}
 	}
 
-
-
-	public static void terminateClientProcess(ClientProcessThread client, Exception e) {
-		System.out.println("Disconnect from client No."+client.id +"("+client.name+")");
-		clients.remove(client.id);
+	public static void send(Message message, int destination) {
+		UnicastPacket packet = new UnicastPacket(SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
+		MessageServer.forward(packet);
 	}
 
-//	todo: clientIdが枯渇したときの話。
+	public static void terminateClientProcess(MessageServerProcess client, Exception e) {
+		System.out.println("[MessageServer] " + "Disconnect from client No."+client.address +"("+client.name+")");
+		clients.remove(client.address);
+	}
+
+//	todo: アドレスが枯渇したときの話。
 
 }

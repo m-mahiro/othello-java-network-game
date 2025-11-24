@@ -1,0 +1,69 @@
+package protocol.packet;
+
+import protocol.ParsingUtil;
+import protocol.message.*;
+
+public class BroadcastPacket implements Packet {
+
+	public final int source;
+	public final Message body;
+
+	private static final PacketType type = PacketType.BROADCAST;
+	private static final int headerSize = 2;
+
+	public BroadcastPacket(int source, Message body) {
+		this.source = source;
+		this.body = body;
+	}
+
+	public static BroadcastPacket parse(String packetString) {
+
+		if (Packet.getTypeFrom(packetString) != BroadcastPacket.type) {
+			throw PacketException.invalidPacketFormat(packetString);
+		}
+
+		// ヘッダーの各要素を取得する
+		String[] args = packetString.split(" ");
+		if (args.length <= 1) {
+			throw PacketException.invalidHeaderFormat(packetString);
+		}
+		int source;
+		try {
+			source = Integer.parseInt(args[1]);
+		} catch (NumberFormatException e) {
+			throw PacketException.invalidHeaderFormat(packetString);
+		}
+
+		// bodyの文字列を取得する
+		String bodyString = ParsingUtil.extractBody(packetString, headerSize);
+
+		// bodyStringをMessageオブジェクト化する
+		Message message = Message.parse(bodyString);
+
+		return new BroadcastPacket(source, message);
+	}
+
+	public PacketType getType() {
+		return BroadcastPacket.type;
+	}
+
+	@Override
+	public String getPacketString() {
+		String str = "";
+		str += BroadcastPacket.type + " ";
+		str += this.source + " ";
+		str += this.body.getMessageString();
+		return str;
+	}
+
+	@Override
+	public Message getBody() {
+		return body;
+	}
+
+	@Override
+	public String toString() {
+		return getPacketString();
+	}
+
+}
