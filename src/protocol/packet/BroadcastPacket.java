@@ -19,12 +19,20 @@ public class BroadcastPacket implements Packet {
 	public static BroadcastPacket parse(String packetString) {
 
 		if (Packet.getTypeFrom(packetString) != BroadcastPacket.type) {
-			throw PacketException.invalidHeaderFormat(packetString);
+			throw PacketException.invalidPacketFormat(packetString);
 		}
 
 		// ヘッダーの各要素を取得する
 		String[] args = packetString.split(" ");
-		int source = Integer.parseInt(args[1]);
+		if (args.length <= 1) {
+			throw PacketException.invalidHeaderFormat(packetString);
+		}
+		int source;
+		try {
+			source = Integer.parseInt(args[1]);
+		} catch (NumberFormatException e) {
+			throw PacketException.invalidHeaderFormat(packetString);
+		}
 
 		// bodyの文字列を取得する
 		String bodyString = ParsingUtil.extractBody(packetString, headerSize);

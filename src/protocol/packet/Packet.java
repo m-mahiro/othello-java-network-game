@@ -21,16 +21,16 @@ public interface Packet {
 		}
 	}
 
-	static boolean compareAddress(Packet packet, MessageServerProcess serverThread) {
+	static boolean compareAddress(Packet packet, int address) {
 		switch (packet.getType()) {
 			case BROADCAST:
 				return false;
 			case UNICAST:
 				assert packet instanceof UnicastPacket;
 				UnicastPacket unicastPacket = (UnicastPacket) packet;
-				return unicastPacket.destination == serverThread.id;
+				return unicastPacket.destination == address;
 		}
-		throw new RuntimeException("想定外のパケットタイプ");
+		throw PacketException.unsupportedPacketType(packet.toString());
 	}
 
 }
