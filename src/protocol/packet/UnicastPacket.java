@@ -20,7 +20,7 @@ public class UnicastPacket implements Packet {
 	public static UnicastPacket parse(String packetString) {
 
 		if(!packetString.startsWith(UnicastPacket.type.toString() + " ")) {
-			throw PacketException.invalidHeaderFormat(packetString);
+			throw PacketException.invalidPacketFormat(packetString);
 		}
 
 		// ヘッダーの各要素を取得する
@@ -42,7 +42,7 @@ public class UnicastPacket implements Packet {
 			}
 		}
 		if (count != headerSize) {
-			throw PacketException.invalidHeaderFormat(packetString) ;
+			throw PacketException.invalidPacketFormat(packetString) ;
 		}
 		String bodyString = packetString.substring(bodyIndex + 1);
 

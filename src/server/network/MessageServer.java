@@ -19,8 +19,10 @@ public class MessageServer {
 		int address = 0;
 		System.out.println("[MessageServer] " + "The Server has launched!");
 
-		try (ServerSocket server = new ServerSocket(10000)) {
+		try {
 
+			@SuppressWarnings("resource")
+			ServerSocket server = new ServerSocket(10000);
 			while (true) {
 				Socket socket = server.accept();
 				System.out.println("[MessageServer] " + "Accept client No." + address);
@@ -47,6 +49,10 @@ public class MessageServer {
 			return;
 		}
 		MessageServerProcess destinationClient = clients.get(packet.destination);
+		if (destinationClient == null) {
+			System.out.println("[MessageServer] Error: Destination client with ID " + packet.destination + " does not exist. Packet not delivered.");
+			return;
+		}
 		destinationClient.push(packet);
 	}
 
@@ -59,7 +65,7 @@ public class MessageServer {
 	}
 
 	public static void send(Message message, int destination) {
-		UnicastPacket packet = new UnicastPacket(0, destination, message); // 0はサーバのアドレス
+		UnicastPacket packet = new UnicastPacket(SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
 		MessageServer.forward(packet);
 	}
 

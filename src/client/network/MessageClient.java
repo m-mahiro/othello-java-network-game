@@ -33,12 +33,12 @@ public class MessageClient extends Thread {
 
 			// アドレスの通知を受ける
 			Message helloMessage = this.waitMessage(); // "Hello, client No.1!" を受け取る
-			System.out.println("[MessageClientThread] " + helloMessage);
+			System.out.println("[MessageClient] " + helloMessage);
 
 		} catch (UnknownHostException e) {
-			System.out.println("[MessageClientThread] " + "ホストのIPアドレスが判定できません。: " + e);
+			System.out.println("[MessageClient] " + "ホストのIPアドレスが判定できません。: " + e);
 		} catch (IOException e) {
-			System.out.println("[MessageClientThread] " + "エラーが発生しました。" + e);
+			System.out.println("[MessageClient] " + "エラーが発生しました。" + e);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -50,9 +50,9 @@ public class MessageClient extends Thread {
 			try {
 				Message message = this.waitMessage();
 				if (message == null) break;
-				System.out.println("[MessageClientThread] " + message);
+				System.out.println("[MessageClient] " + message);
 			} catch (IOException e) {
-				System.out.println("[MessageClientThread] " + e.getMessage());
+				System.out.println("[MessageClient] " + e.getMessage());
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -62,7 +62,7 @@ public class MessageClient extends Thread {
 	public void transport(Packet packet) {
 		out.println(packet);
 		out.flush();
-		System.out.println("[MessageClientThread] " + packet);
+		System.out.println("[MessageClient] " + packet);
 	}
 
 	public void broadcast(Message message) {

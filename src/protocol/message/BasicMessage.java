@@ -39,7 +39,7 @@ public final class BasicMessage implements Message {
 			}
 		}
 		if (count != headerSize) {
-			throw PacketException.invalidHeaderFormat(messageString) ;
+			throw MessageException.invalidMessageFormat(messageString) ;
 		}
 		content = messageString.substring(bodyIndex + 1);
 
