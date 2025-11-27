@@ -28,8 +28,9 @@ public interface Packet {
 				assert packet instanceof UnicastPacket;
 				UnicastPacket unicastPacket = (UnicastPacket) packet;
 				return unicastPacket.destination == address;
+			default:
+				throw PacketException.unsupportedPacketType(packet.getType());
 		}
-		throw PacketException.unsupportedPacketType(packet.getType());
 	}
 
 }
