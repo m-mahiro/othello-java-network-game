@@ -18,26 +18,26 @@ public class BroadcastPacket implements Packet {
 
 	public static BroadcastPacket parse(String packetString) {
 
-		if (Packet.getTypeFrom(packetString) != BroadcastPacket.type) {
-			throw PacketException.invalidPacketFormat(packetString);
+		// パケットタイプのエラーハンドリング
+		PacketType packetType = Packet.getTypeFrom(packetString);
+		if (packetType != BroadcastPacket.type) {
+			throw PacketException.illegalPacketType(packetType);
 		}
 
 		// ヘッダーの各要素を取得する
 		String[] args = packetString.split(" ");
-		if (args.length <= 1) {
-			throw PacketException.invalidHeaderFormat(packetString);
+		if (args.length < headerSize) {
+			throw PacketException.invalidPacketFormat(packetString);
 		}
 		int source;
 		try {
 			source = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
-			throw PacketException.invalidHeaderFormat(packetString);
+			throw PacketException.invalidPacketFormat(packetString);
 		}
 
-		// bodyの文字列を取得する
+		// bodyを取得する
 		String bodyString = ParsingUtil.extractBody(packetString, headerSize);
-
-		// bodyStringをMessageオブジェクト化する
 		Message message = Message.parse(bodyString);
 
 		return new BroadcastPacket(source, message);
