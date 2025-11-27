@@ -1,7 +1,6 @@
 package protocol.message;
 
 import protocol.ParsingUtil;
-import protocol.packet.PacketException;
 
 public final class BasicMessage implements Message {
 
@@ -27,6 +26,7 @@ public final class BasicMessage implements Message {
 			throw MessageException.noSuchMessageType(args[0]);
 		}
 
+		// bodyの抽出
 		content = ParsingUtil.extractBody(messageString, headerSize);
 
 		return new BasicMessage(content);

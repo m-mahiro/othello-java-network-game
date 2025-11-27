@@ -10,12 +10,15 @@ public class MessageException extends RuntimeException {
 		return new MessageException("No such message type: " + messageString); // todo: 英語がおかしい
 	}
 
+	public static MessageException invalidMessageFormat(String messageString) {
+		return new MessageException("Invalid message format: " + messageString);
+	}
+
 	public static MessageException illegalMessageType(MessageType type) {
 		return new MessageException("Illegal message type: " + type.toString());
 	}
 
-	public static MessageException invalidMessageFormat(String messageString) {
-		return new MessageException("Invalid message format: " + messageString);
-	}
+
+
 
 }

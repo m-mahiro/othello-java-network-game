@@ -20,19 +20,28 @@ public class UnicastPacket implements Packet {
 
 	public static UnicastPacket parse(String packetString) {
 
-		if(!packetString.startsWith(UnicastPacket.type.toString() + " ")) {
-			throw PacketException.invalidPacketFormat(packetString);
+		// パケットタイプのエラーハンドリング
+		PacketType packetType = Packet.getTypeFrom(packetString);
+		if(packetType != UnicastPacket.type) {
+			throw PacketException.illegalPacketType(packetType);
 		}
 
 		// ヘッダーの各要素を取得する
 		String[] args =  packetString.split(" ");
-		int source = Integer.parseInt(args[1]);
-		int destination = Integer.parseInt(args[2]);
+		if (args.length < headerSize) {
+			throw PacketException.invalidPacketFormat(packetString);
+		}
+		int source;
+		int destination;
+		try {
+			source = Integer.parseInt(args[1]);
+			destination = Integer.parseInt(args[2]);
+		} catch (NumberFormatException e) {
+			throw PacketException.invalidPacketFormat(packetString);
+		}
 
-		// bodyの文字列を取得する
+		// bodyを取得する
 		String bodyString = ParsingUtil.extractBody(packetString, headerSize);
-
-		// bodyStringをMessageオブジェクト化する
 		Message message = Message.parse(bodyString);
 
 		return new UnicastPacket(source, destination, message);
