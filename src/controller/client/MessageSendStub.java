@@ -1,7 +1,7 @@
-package client.controller;
+package controller.client;
 
 
-import client.network.MessageClient;
+import network.client.MessageClient;
 import protocol.message.*;
 import protocol.packet.*;
 

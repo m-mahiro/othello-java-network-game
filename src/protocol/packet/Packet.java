@@ -1,7 +1,6 @@
 package protocol.packet;
 
 import protocol.message.Message;
-import server.network.MessageServerProcess;
 
 public interface Packet {
 

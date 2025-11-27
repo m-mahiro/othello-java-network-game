@@ -1,7 +1,7 @@
-package client.controller;
+package controller.client;
 
 
-import client.network.MessageClient;
+import network.client.MessageClient;
 
 public class OthelloClient {
 	public static void main(String[] args) {

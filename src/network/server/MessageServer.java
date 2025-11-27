@@ -1,4 +1,4 @@
-package server.network;
+package network.server;
 
 import protocol.message.Message;
 import protocol.packet.*;
