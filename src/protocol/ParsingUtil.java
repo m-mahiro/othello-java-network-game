@@ -44,7 +44,7 @@ public class ParsingUtil {
 		}
 		
 		if (count != headerSize) {
-			throw PacketException.invalidHeaderFormat(inputString);
+			throw PacketException.invalidPacketFormat(inputString);
 		}
 		
 		return inputString.substring(bodyIndex + 1);

@@ -1,7 +1,7 @@
 package network.client;
 
-import protocol.message.BasicMessage;
-import protocol.message.Message;
+import com.sun.xml.internal.bind.v2.runtime.output.StAXExStreamWriterOutput;
+import protocol.message.*;
 import protocol.packet.*;
 
 import java.io.BufferedReader;
@@ -15,25 +15,22 @@ public class MessageClient extends Thread {
 
 	private BufferedReader in;
 	private PrintWriter out;
-	public final int address = 1;
+	private int address;
+	private String clientName;
+
+	private final int SERVER_ADDRESS = 0;
 
 	public MessageClient(String clientName) {
+
+		this.clientName = clientName;
+
+		// 通信路の確立
 		try {
-			// 通信路の確立
 			@SuppressWarnings("resource")
 			Socket socket = new Socket("localhost", 10000);
 			InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 			this.in = new BufferedReader(inputStreamReader);
 			this.out = new PrintWriter(socket.getOutputStream());
-
-			// clientNameをサーバに送信する
-			BasicMessage message = new BasicMessage(clientName);
-			UnicastPacket packet = new UnicastPacket(this.address, 0, message);
-			this.transport(packet); // 接続して初めの一行はclientName todo: 気に入らない
-
-			// アドレスの通知を受ける
-			Message helloMessage = this.waitMessage(); // "Hello, client No.1!" を受け取る
-			System.out.println("[MessageClient] " + helloMessage);
 
 		} catch (UnknownHostException e) {
 			System.out.println("[MessageClient] " + "ホストのIPアドレスが判定できません。: " + e);
@@ -45,17 +42,32 @@ public class MessageClient extends Thread {
 	}
 
 
-	public void run () {
-		while(true) {
-			try {
-				Message message = this.waitMessage();
+	public void run() {
+		Message message;
+		try {
+			// サーバからの通知を基に、クライアントの設定をする
+			message = this.waitMessage();
+			if (message.getType() == MessageType.CLIENT_CONFIG) {
+				ClientConfigMessage clientConfigMessage = (ClientConfigMessage) message;
+				this.setAddress(clientConfigMessage.clientAddress);
+				System.out.println("[MessageClient] Address Config Done! (address: " + address + ")");
+			}
+
+			// クライアントのプロフィールをサーバに通知する
+			ClientProfileMessage clientProfileMessage = new ClientProfileMessage(clientName);
+			UnicastPacket packet = new UnicastPacket(this.address, SERVER_ADDRESS, clientProfileMessage);
+			this.transport(packet); // 接続して初めの一行はclientName todo: 気に入らない
+
+			while (true) {
+				message = this.waitMessage();
 				if (message == null) break;
 				System.out.println("[MessageClient] " + message);
-			} catch (IOException e) {
-				System.out.println("[MessageClient] " + e.getMessage());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
 			}
+
+		} catch (IOException e) {
+			System.out.println("[MessageClient] " + e.getMessage());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -76,7 +88,7 @@ public class MessageClient extends Thread {
 	}
 
 
-	public Message waitMessage() throws Exception {
+	private Message waitMessage() throws IOException {
 		String packetString = in.readLine();
 		if (packetString == null) return null;
 
@@ -91,10 +103,17 @@ public class MessageClient extends Thread {
 				packet = BroadcastPacket.parse(packetString);
 				break;
 			default:
-				throw PacketException.noSuchPacketType(packetString); // todo: 違うエラー内容の方が良いかな?
+				throw PacketException.unsupportedPacketType(packetType); // todo: 違うエラー内容の方が良いかな?
 		}
-
 		return packet.getBody();
 	}
 
+	// ================== ゲッター / セッター ==================
+	public void setAddress(int address) {
+		this.address = address;
+	}
+
+	public int getAddress() {
+		return this.address;
+	}
 }

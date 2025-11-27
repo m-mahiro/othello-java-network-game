@@ -19,7 +19,7 @@ public class ClientConfigMessage implements Message {
 		// メッセージタイプのエラーハンドリング
 		try {
 			type = MessageType.valueOf(args[0]);
-			if (type != BasicMessage.type) throw MessageException.illegalMessageType(type);
+			if (type != ClientConfigMessage.type) throw MessageException.illegalMessageType(type);
 		} catch (IllegalArgumentException e) {
 			throw MessageException.noSuchMessageType(args[0]);
 		}

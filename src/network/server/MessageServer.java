@@ -16,7 +16,7 @@ public class MessageServer {
 	private static final int SERVER_ADDRESS = 0;
 
 	public static void main(String[] args) {
-		int address = 0;
+		int address = 1;
 		System.out.println("[MessageServer] " + "The Server has launched!");
 
 		try {
@@ -24,16 +24,17 @@ public class MessageServer {
 			@SuppressWarnings("resource")
 			ServerSocket server = new ServerSocket(10000);
 			while (true) {
+
+				// 通信路を確立
 				Socket socket = server.accept();
-				System.out.println("[MessageServer] " + "Accept client No." + address);
-				address++;
 				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 				BufferedReader in = new BufferedReader(inputStreamReader);
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-				String clientName = in.readLine(); // 接続して初めの一行はclientName todo: 気に入らない
-				MessageServerProcess client = new MessageServerProcess(address, in, out, clientName);
-				clients.put(address, client);
-				client.start();
+
+				// サーバープロセスを生成
+				MessageServerProcess client = new MessageServerProcess(address, in, out);
+				MessageServer.registerClient(client);
+				System.out.println("[MessageServer] " + "Accept client No." + address++);
 			}
 
 		} catch (Exception e) {
@@ -70,8 +71,12 @@ public class MessageServer {
 	}
 
 	public static void terminateClientProcess(MessageServerProcess client, Exception e) {
-		System.out.println("[MessageServer] " + "Disconnect from client No."+client.address +"("+client.name+")");
-		clients.remove(client.address);
+		System.out.println("[MessageServer] " + "Disconnect from client No."+client.getAddress() +"("+client.getClientName()+")");
+		clients.remove(client.getAddress());
+	}
+
+	public static void registerClient(MessageServerProcess client) {
+		MessageServer.clients.put(client.getAddress(), client);
 	}
 
 //	todo: アドレスが枯渇したときの話。

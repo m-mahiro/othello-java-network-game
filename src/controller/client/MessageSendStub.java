@@ -20,7 +20,7 @@ public class MessageSendStub {
 				break;
 			}
 			Message message = new BasicMessage(input);
-			Packet packet = new BroadcastPacket(messageClient.address, message);
+			Packet packet = new BroadcastPacket(messageClient.getAddress(), message);
 			messageClient.transport(packet);
 		}
 		sc.close();
