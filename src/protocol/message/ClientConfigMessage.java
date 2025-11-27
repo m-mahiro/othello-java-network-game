@@ -1,22 +1,20 @@
 package protocol.message;
 
-import protocol.ParsingUtil;
+public class ClientConfigMessage implements Message {
 
-public final class BasicMessage implements Message {
-
-	public static final MessageType type = MessageType.BASIC;
-	public final String content;
+	public static final MessageType type = MessageType.CLIENT_CONFIG;
+	public final int clientAddress;
 
 	private static final int headerSize = 1;
 
-	public BasicMessage(String content) {
-		this.content = content;
+	public ClientConfigMessage(int clientAddress) {
+		this.clientAddress = clientAddress;
 	}
 
-	public static BasicMessage parse(String messageString) {
+	public static ClientConfigMessage parse(String messageString) {
 		String[] args = messageString.split(" ");
 		MessageType type;
-		String content;
+		int address;
 
 		// メッセージタイプのエラーハンドリング
 		try {
@@ -27,25 +25,29 @@ public final class BasicMessage implements Message {
 		}
 
 		// bodyの抽出
-		content = ParsingUtil.extractBody(messageString, headerSize);
+		try {
+			address = Integer.parseInt(args[1]);
+		} catch (NumberFormatException e) {
+			throw MessageException.invalidMessageFormat(messageString);
+		}
 
-		return new BasicMessage(content);
+		return new ClientConfigMessage(address);
 	}
 
 	@Override
 	public String getMessageString() {
 		String str = "";
-		str += BasicMessage.type.toString() + " ";
-		str += this.content;
+		str += ClientConfigMessage.type.toString() + " ";
+		str += this.clientAddress;
 		return str;
 	}
 
 	@Override
 	public MessageType getType() {
-		return BasicMessage.type;
+		return ClientConfigMessage.type;
 	}
 
-
+	@Override
 	public String toString() {
 		return getMessageString();
 	}

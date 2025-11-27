@@ -22,6 +22,8 @@ public interface Message {
 			case BASIC:
 				message = BasicMessage.parse(bodyString);
 				break;
+			case CLIENT_PROFILE:
+				message = ClientConfigMessage.parse(bodyString);
 			default:
 				throw MessageException.noSuchMessageType(bodyString); // todo: 違うエラー内容の方が良いかな?
 		}
