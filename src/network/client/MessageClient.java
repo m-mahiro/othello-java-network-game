@@ -56,22 +56,13 @@ public class MessageClient extends Thread {
 			// この処理を関数化してはいけない。run()以外でメッセージを受け取ることを想定していないから。
 			String body;
 			while (true) {
+
+				// 文字列を受信する
 				String packetString = in.readLine();
 				if (packetString == null) break;
 
 				// Packetオブジェクト化
-				Packet packet;
-				PacketType packetType = Packet.getTypeFrom(packetString);
-				switch (packetType) {
-					case UNICAST:
-						packet = new Packet(packetString);
-						break;
-					case BROADCAST:
-						packet = new BroadcastPacket(packetString);
-						break;
-					default:
-						throw PacketException.unsupportedPacketType(packetType);
-				}
+				Packet packet = new Packet(packetString);
 
 				// bodyを取得
 				body = packet.getBody();
@@ -92,7 +83,7 @@ public class MessageClient extends Thread {
 	}
 
 	public void broadcast(String message) {
-		BroadcastPacket packet = new BroadcastPacket(this.address, message);
+		Packet packet = new Packet(this.address, Packet.BROADCAST_ADDRESS, message);
 		transport(packet);
 	}
 

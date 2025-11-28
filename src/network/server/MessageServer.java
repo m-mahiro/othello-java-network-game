@@ -1,5 +1,6 @@
 package network.server;
 
+import org.omg.CORBA.ContextList;
 import protocol.packet.*;
 
 import java.io.BufferedReader;
@@ -10,10 +11,10 @@ import java.net.Socket;
 import java.util.HashMap;
 
 public class MessageServer {
-	final private static int MAX_CONNECTION = 100;
+
+	private final static int MAX_CONNECTION = 100;
 	private static final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
-	private static final int SERVER_ADDRESS = 0;
-	
+
 	private static void log(String method, String string) {
 		if (method.equals("()")) {
 			System.out.println("[BroadcastPacket()] " + string);
@@ -54,29 +55,33 @@ public class MessageServer {
 	}
 
 	public static void forward(Packet packet) {
-		if (packet.destination == SERVER_ADDRESS) {
-			log("forward" ,packet.format());
-			// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
-			return;
-		}
-		MessageServerProcess destinationClient = clients.get(packet.destination);
-		if (destinationClient == null) {
-			log("forward", "Error: Destination client with ID " + packet.destination + " does not exist. Packet not delivered.");
-			return;
-		}
-		destinationClient.push(packet);
-	}
+		switch (packet.destination) {
+			// ブロードキャスト
+			case Packet.BROADCAST_ADDRESS: {
+				for (MessageServerProcess client : clients.values()) {
+					client.push(packet);
+				}
+				// ここにbreakがないのはわざと
+			}
 
-	public static void forward(BroadcastPacket packet) {
-		log("forward" ,packet.format());
-		// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
-		for (MessageServerProcess client : clients.values()) {
-			client.push(packet);
+			// サーバ宛て
+			case Packet.SERVER_ADDRESS: {
+				// ブロードキャストの場合も、サーバは受信する。
+				System.out.println("Receive: " + packet.format());
+				break;
+			}
+
+			// ユニキャスト
+			default: {
+				MessageServerProcess client = clients.get(packet.destination);
+				client.push(packet);
+				break;
+			}
 		}
 	}
 
 	public static void send(String message, int destination) {
-		Packet packet = new Packet(SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
+		Packet packet = new Packet(Packet.SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
 		MessageServer.forward(packet);
 	}
 

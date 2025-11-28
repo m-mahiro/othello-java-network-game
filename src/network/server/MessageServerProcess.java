@@ -13,6 +13,15 @@ public class MessageServerProcess extends Thread {
 	private final BufferedReader in;
 	private final PrintWriter out;
 
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[BroadcastPacket()] " + string);
+		} else {
+			System.out.println("[BroadcastPacket." + method + "()] " + string);
+		}
+
+	}
+
 	MessageServerProcess(int address, BufferedReader in, PrintWriter out) {
 
 		this.address = address;
@@ -25,48 +34,25 @@ public class MessageServerProcess extends Thread {
 		this.start();
 	}
 
-	private void log(String method, String string) {
-		if (method.equals("()")) {
-			System.out.println("[BroadcastPacket()] " + string);
-		} else {
-			System.out.println("[BroadcastPacket." + method + "()] " + string);
-		}
-
-	}
-
 	public void run() {
 		try {
-			// メッセージの受け取りを開始する
 			String message;
+
+			// メッセージの受け取りを開始する
 			while (true) {
-				// メッセージを待つ
+
+				// パケットを待つ
 				String packetString = in.readLine();
 				if (packetString == null) break; // ストリームラインの最後
+				Packet packet = new Packet(packetString);
 
-				// Packetインスタンス化
-				PacketType packetType = Packet.getTypeFrom(packetString);
-				switch (packetType) {
-					case UNICAST:
-						Packet unicastPacket = new Packet(packetString);
-						if (unicastPacket.compareAddress(this.address)) {
-							message = unicastPacket.body;
-						} else {
-							MessageServer.forward(unicastPacket);
-							continue;
-						}
-						break;
-					case BROADCAST:
-						BroadcastPacket broadcastPacket = new BroadcastPacket(packetString);
-						MessageServer.forward(broadcastPacket);
-						continue;
-					default:
-						throw PacketException.unsupportedPacketType(packetType);
-				}
-				log("run" ,message);
+				// 受け取たパケットは全てMessageServerに任せる
+				MessageServer.forward(packet);
+				log("run", "Fetched: " + packet);
 			}
 
 		} catch (IOException e) {
-//			MessageServer.terminateClientProcess(this, e);
+			MessageServer.terminateClientProcess(this, e);
 			throw new RuntimeException(e); // todo: ちゃんと定義したExceptionを使わないといけない
 		}
 	}
@@ -74,7 +60,7 @@ public class MessageServerProcess extends Thread {
 	public void push(Packet packet) {
 		out.println(packet);
 		out.flush();
-		log("push" ,packet.toString());
+		log("push", packet.toString());
 	}
 
 	// ================== ゲッター / セッター ==================
