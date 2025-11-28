@@ -8,11 +8,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
-public class MessageServer {
+public class MessageServer extends Thread {
 
 	private final int MAX_CONNECTION;
 	private final int PORT;
 	private final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
+	private int threadCount = 0;
 
 	private void log(String method, String string) {
 		if (method.equals("()")) {
@@ -26,6 +27,13 @@ public class MessageServer {
 		this.PORT = port;
 		this.MAX_CONNECTION = maxConnection;
 		log("()" ,"The Server has launched!");
+		this.start();
+	}
+
+	@Override
+	public void run() {
+		threadCount++;
+		if (threadCount > 1) throw new RuntimeException("2つ以上のスレッドは開始できません。");
 
 		// クライアントの受付を開始
 		int address = 0;

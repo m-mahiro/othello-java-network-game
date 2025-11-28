@@ -1,7 +1,6 @@
 package controller.client;
 
 import network.MessageClient;
-import protocol.packet.*;
 import java.util.*;
 
 public class MessageSendStub {
