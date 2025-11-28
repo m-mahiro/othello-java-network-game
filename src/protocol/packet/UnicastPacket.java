@@ -1,6 +1,5 @@
 package protocol.packet;
 
-import protocol.ParsingUtil;
 import protocol.message.*;
 
 public class UnicastPacket implements Packet {
@@ -19,20 +18,17 @@ public class UnicastPacket implements Packet {
 	}
 
 	public static UnicastPacket parse(String packetString) {
-
-		// パケットタイプのエラーハンドリング
-		PacketType packetType = Packet.getTypeFrom(packetString);
-		if(packetType != UnicastPacket.type) {
-			throw PacketException.illegalPacketType(packetType);
-		}
-
-		// ヘッダーの各要素を取得する
-		String[] args =  packetString.split(" ");
-		if (args.length < headerSize) {
-			throw PacketException.invalidPacketFormat(packetString);
-		}
 		int source;
 		int destination;
+		Message body;
+
+		// パケットタイプのエラーハンドリング
+		PacketType type = Packet.getTypeFrom(packetString);
+		if (type != UnicastPacket.type) throw PacketException.illegalPacketType(type);
+
+		// ヘッダーの各要素を取得する
+		String[] args = packetString.split(" ");
+		if (args.length < headerSize) throw PacketException.invalidPacketFormat(packetString);
 		try {
 			source = Integer.parseInt(args[1]);
 			destination = Integer.parseInt(args[2]);
@@ -41,10 +37,23 @@ public class UnicastPacket implements Packet {
 		}
 
 		// bodyを取得する
-		String bodyString = ParsingUtil.extractBody(packetString, headerSize);
-		Message message = Message.parse(bodyString);
+		char[] charArray = packetString.toCharArray();
+		int count = 0;
+		int bodyIndex = -1;
+		for (int i = 0; i < charArray.length; i++) {
+			if (charArray[i] == ' ') {
+				count++;
+			}
+			if (count == headerSize) {
+				bodyIndex = i;
+				break;
+			}
+		}
+		if (count != headerSize) throw PacketException.invalidPacketFormat(packetString);
+		String bodyString = packetString.substring(bodyIndex + 1);
+		body = Message.parse(bodyString);
 
-		return new UnicastPacket(source, destination, message);
+		return new UnicastPacket(source, destination, body);
 	}
 
 	@Override

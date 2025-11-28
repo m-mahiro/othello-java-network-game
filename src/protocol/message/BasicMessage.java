@@ -1,7 +1,5 @@
 package protocol.message;
 
-import protocol.ParsingUtil;
-
 public final class BasicMessage implements Message {
 
 	public static final MessageType type = MessageType.BASIC;
@@ -14,9 +12,10 @@ public final class BasicMessage implements Message {
 	}
 
 	public static BasicMessage parse(String messageString) {
-		String[] args = messageString.split(" ");
 		MessageType type;
 		String content;
+
+		String[] args = messageString.split(" ");
 
 		// メッセージタイプのエラーハンドリング
 		try {
@@ -27,7 +26,21 @@ public final class BasicMessage implements Message {
 		}
 
 		// bodyの抽出
-		content = ParsingUtil.extractBody(messageString, headerSize);
+		char[] charArray = messageString.toCharArray();
+		int count = 0;
+		int bodyIndex = -1;
+
+		for (int i = 0; i < charArray.length; i++) {
+			if (charArray[i] == ' ') {
+				count++;
+			}
+			if (count == headerSize) {
+				bodyIndex = i;
+				break;
+			}
+		}
+		if (count != headerSize) throw MessageException.invalidMessageFormat(messageString);
+		content = messageString.substring(bodyIndex + 1);
 
 		return new BasicMessage(content);
 	}

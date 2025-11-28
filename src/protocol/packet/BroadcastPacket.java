@@ -1,6 +1,5 @@
 package protocol.packet;
 
-import protocol.ParsingUtil;
 import protocol.message.*;
 
 public class BroadcastPacket implements Packet {
@@ -18,10 +17,14 @@ public class BroadcastPacket implements Packet {
 
 	public static BroadcastPacket parse(String packetString) {
 
+		int source;
+		Message body;
+
+
 		// パケットタイプのエラーハンドリング
-		PacketType packetType = Packet.getTypeFrom(packetString);
-		if (packetType != BroadcastPacket.type) {
-			throw PacketException.illegalPacketType(packetType);
+		PacketType type = Packet.getTypeFrom(packetString);
+		if (type != BroadcastPacket.type) {
+			throw PacketException.illegalPacketType(type);
 		}
 
 		// ヘッダーの各要素を取得する
@@ -29,7 +32,6 @@ public class BroadcastPacket implements Packet {
 		if (args.length < headerSize) {
 			throw PacketException.invalidPacketFormat(packetString);
 		}
-		int source;
 		try {
 			source = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
@@ -37,10 +39,23 @@ public class BroadcastPacket implements Packet {
 		}
 
 		// bodyを取得する
-		String bodyString = ParsingUtil.extractBody(packetString, headerSize);
-		Message message = Message.parse(bodyString);
+		char[] charArray = packetString.toCharArray();
+		int count = 0;
+		int bodyIndex = -1;
+		for (int i = 0; i < charArray.length; i++) {
+			if (charArray[i] == ' ') {
+				count++;
+			}
+			if (count == headerSize) {
+				bodyIndex = i;
+				break;
+			}
+		}
+		if (count != headerSize) throw PacketException.invalidPacketFormat(packetString);
+		String bodyString = packetString.substring(bodyIndex + 1);
+		body = Message.parse(bodyString);
 
-		return new BroadcastPacket(source, message);
+		return new BroadcastPacket(source, body);
 	}
 
 	public PacketType getType() {

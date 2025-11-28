@@ -1,7 +1,5 @@
 package protocol.message;
 
-import protocol.ParsingUtil;
-
 public class ClientProfileMessage implements Message {
 
 	public static final MessageType type = MessageType.CLIENT_PROFILE;
@@ -14,9 +12,11 @@ public class ClientProfileMessage implements Message {
 	}
 
 	public static ClientProfileMessage parse(String messageString) {
-		String[] args = messageString.split(" ");
+
 		MessageType type;
 		String name;
+
+		String[] args = messageString.split(" ");
 
 		// メッセージタイプのエラーハンドリング
 		try {
@@ -26,7 +26,21 @@ public class ClientProfileMessage implements Message {
 			throw MessageException.noSuchMessageType(args[0]);
 		}
 
-		name = ParsingUtil.extractBody(messageString, headerSize);
+		char[] charArray = messageString.toCharArray();
+		int count = 0;
+		int bodyIndex = -1;
+
+		for (int i = 0; i < charArray.length; i++) {
+			if (charArray[i] == ' ') {
+				count++;
+			}
+			if (count == headerSize) {
+				bodyIndex = i;
+				break;
+			}
+		}
+		if (count != headerSize) throw MessageException.invalidMessageFormat(messageString);
+		name = messageString.substring(bodyIndex + 1);
 
 		return new ClientProfileMessage(name);
 	}
