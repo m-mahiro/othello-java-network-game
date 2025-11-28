@@ -1,6 +1,6 @@
 package protocol.packet;
 
-public class UnicastPacket implements Packet {
+public class Packet implements Packet {
 
 	public final int source;
 	public final int destination;
@@ -9,16 +9,16 @@ public class UnicastPacket implements Packet {
 	private static final PacketType type = PacketType.UNICAST;
 	private static final int headerSize = 3;
 
-	public UnicastPacket(int source, int destination, String body) {
+	public Packet(int source, int destination, String body) {
 		this.source = source;
 		this.destination = destination;
 		this.body = body;
 	}
 
-	public UnicastPacket(String packetString) {
+	public Packet(String packetString) {
 		// パケットタイプのエラーハンドリング
 		PacketType type = Packet.getTypeFrom(packetString);
-		if (type != UnicastPacket.type) throw PacketException.illegalPacketType(type);
+		if (type != Packet.type) throw PacketException.illegalPacketType(type);
 
 		// ヘッダーの各要素を取得する
 		String[] args = packetString.split(" ");
@@ -49,7 +49,7 @@ public class UnicastPacket implements Packet {
 
 	@Override
 	public PacketType getType() {
-		return UnicastPacket.type;
+		return Packet.type;
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class UnicastPacket implements Packet {
 	@Override
 	public String format() {
 		String str = "";
-		str += UnicastPacket.type.toString() + " ";
+		str += Packet.type.toString() + " ";
 		str += this.source + " ";
 		str += this.destination + " ";
 		str += body;

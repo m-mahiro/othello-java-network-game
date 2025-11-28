@@ -47,7 +47,7 @@ public class MessageServerProcess extends Thread {
 				PacketType packetType = Packet.getTypeFrom(packetString);
 				switch (packetType) {
 					case UNICAST:
-						UnicastPacket unicastPacket = new UnicastPacket(packetString);
+						Packet unicastPacket = new Packet(packetString);
 						if (unicastPacket.compareAddress(this.address)) {
 							message = unicastPacket.body;
 						} else {

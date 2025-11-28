@@ -64,7 +64,7 @@ public class MessageClient extends Thread {
 				PacketType packetType = Packet.getTypeFrom(packetString);
 				switch (packetType) {
 					case UNICAST:
-						packet = new UnicastPacket(packetString);
+						packet = new Packet(packetString);
 						break;
 					case BROADCAST:
 						packet = new BroadcastPacket(packetString);
@@ -97,7 +97,7 @@ public class MessageClient extends Thread {
 	}
 
 	public void send(int destination, String message) {
-		UnicastPacket packet = new UnicastPacket(this.address, destination, message);
+		Packet packet = new Packet(this.address, destination, message);
 		transport(packet);
 	}
 

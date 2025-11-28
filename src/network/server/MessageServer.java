@@ -53,7 +53,7 @@ public class MessageServer {
 		}
 	}
 
-	public static void forward(UnicastPacket packet) {
+	public static void forward(Packet packet) {
 		if (packet.destination == SERVER_ADDRESS) {
 			log("forward" ,packet.format());
 			// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
@@ -76,7 +76,7 @@ public class MessageServer {
 	}
 
 	public static void send(String message, int destination) {
-		UnicastPacket packet = new UnicastPacket(SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
+		Packet packet = new Packet(SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
 		MessageServer.forward(packet);
 	}
 
