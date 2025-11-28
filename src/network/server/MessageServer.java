@@ -54,7 +54,8 @@ public class MessageServer {
 		}
 	}
 
-	public static void forward(Packet packet) {
+	// パッケージプライベート
+	static void forward(Packet packet) {
 		switch (packet.destination) {
 			// ブロードキャスト
 			case Packet.BROADCAST_ADDRESS: {

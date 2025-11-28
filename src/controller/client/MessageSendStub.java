@@ -15,8 +15,7 @@ public class MessageSendStub {
 			if (message.equalsIgnoreCase("exit")) {
 				break;
 			}
-			Packet packet = new BroadcastPacket(messageClient.getAddress(), message);
-			messageClient.transport(packet);
+			messageClient.broadcast(message);
 		}
 		sc.close();
 	}

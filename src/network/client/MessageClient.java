@@ -76,7 +76,8 @@ public class MessageClient extends Thread {
 		}
 	}
 
-	public void transport(Packet packet) {
+	// プライベートメソッド
+	private void transport(Packet packet) {
 		out.println(packet);
 		out.flush();
 		log("transport" , packet.toString());
