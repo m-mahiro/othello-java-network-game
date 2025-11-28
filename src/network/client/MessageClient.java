@@ -1,7 +1,5 @@
 package network.client;
 
-
-
 import network.Packet;
 
 import java.io.BufferedReader;
@@ -16,9 +14,8 @@ public class MessageClient extends Thread {
 	private BufferedReader in;
 	private PrintWriter out;
 	private int address;
+	private int threadCount = 0;
 
-	private final int SERVER_ADDRESS = 0;
-	
 	private void log(String method, String string) {
 		if (method.equals("()")) {
 			System.out.println("[MessageClient()] " + string);
@@ -53,6 +50,9 @@ public class MessageClient extends Thread {
 	}
 
 	public void run() {
+		// クライアント一つにつき、1つのスレッドである必要がある
+		threadCount++;
+		if (threadCount > 1) throw new RuntimeException("2つ以上のスレッドは開始できません。");
 
 		try {
 			// この処理を関数化してはいけない。run()以外でメッセージを受け取ることを想定していないから。
@@ -61,7 +61,7 @@ public class MessageClient extends Thread {
 
 				// 文字列を受信する
 				String packetString = in.readLine();
-				if (packetString == null) break;
+				if (packetString == null) break; // todo: ここはExceptionを吐くべき?
 
 				// Packetオブジェクト化
 				Packet packet = new Packet(packetString);
@@ -88,6 +88,7 @@ public class MessageClient extends Thread {
 		transport(packet);
 	}
 
+
 	// ================== ゲッター / セッター ==================
 	public void setAddress(int address) {
 		this.address = address;
@@ -96,6 +97,7 @@ public class MessageClient extends Thread {
 	public int getAddress() {
 		return this.address;
 	}
+
 
 	// ================== プライベートメソッド ==================
 	private void transport(Packet packet) {
