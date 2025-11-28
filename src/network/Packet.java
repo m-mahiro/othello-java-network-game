@@ -17,6 +17,7 @@ public class Packet {
 		this.body = body;
 	}
 
+	// todo: このコンストラクタがパブリックはまずい
 	public Packet(String packetString) {
 
 		// ヘッダーの各要素を取得する
