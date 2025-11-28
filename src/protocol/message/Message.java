@@ -22,9 +22,6 @@ public interface Message {
 			case BASIC:
 				message = BasicMessage.parse(bodyString);
 				break;
-			case CLIENT_CONFIG:
-				message = ClientConfigMessage.parse(bodyString);
-				break;
 			case CLIENT_PROFILE:
 				message = ClientProfileMessage.parse(bodyString);
 				break;
