@@ -57,7 +57,6 @@ public final class BasicMessage implements Message {
 		return BasicMessage.type;
 	}
 
-
 	public String toString() {
 		return getMessageString();
 	}
