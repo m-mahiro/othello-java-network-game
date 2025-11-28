@@ -5,12 +5,12 @@ import protocol.ParsingUtil;
 public class ClientProfileMessage implements Message {
 
 	public static final MessageType type = MessageType.CLIENT_PROFILE;
-	public final String name;
+	public final String clientName;
 
 	private static final int headerSize = 1;
 
-	public ClientProfileMessage(String name) {
-		this.name = name;
+	public ClientProfileMessage(String clientName) {
+		this.clientName = clientName;
 	}
 
 	public static ClientProfileMessage parse(String messageString) {
@@ -35,7 +35,7 @@ public class ClientProfileMessage implements Message {
 	public String getMessageString() {
 		String str = "";
 		str += ClientProfileMessage.type.toString() + " ";
-		str += name;
+		str += clientName;
 		return str;
 	}
 
