@@ -48,10 +48,6 @@ public class Packet {
 		return body;
 	}
 
-	public boolean compareAddress(int address) {
-		return this.destination == address;
-	}
-
 	public String format() {
 		String str = "";
 		str += this.source + " ";
