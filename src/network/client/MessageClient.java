@@ -43,24 +43,31 @@ public class MessageClient extends Thread {
 
 
 	public void run() {
-		Message message;
+
 		try {
-			// サーバからの通知を基に、クライアントの設定をする
-			message = this.waitMessage();
-			if (message.getType() == MessageType.CLIENT_CONFIG) {
-				ClientConfigMessage clientConfigMessage = (ClientConfigMessage) message;
-				this.setAddress(clientConfigMessage.clientAddress);
-				System.out.println("[MessageClient] Address Config Done! (address: " + address + ")");
-			}
+			// サーバからアドレスの通知を受ける
+			this.address = Integer.parseInt(in.readLine());
 
-			// クライアントのプロフィールをサーバに通知する
-			ClientProfileMessage clientProfileMessage = new ClientProfileMessage(clientName);
-			UnicastPacket packet = new UnicastPacket(this.address, SERVER_ADDRESS, clientProfileMessage);
-			this.transport(packet); // 接続して初めの一行はclientName todo: 気に入らない
-
+			// メッセージの受け取りを開始
+			Message message;
 			while (true) {
-				message = this.waitMessage();
-				if (message == null) break;
+				String packetString = in.readLine();
+				if (packetString == null) break;
+
+				// Packetオブジェクト化
+				Packet packet;
+				PacketType packetType = Packet.getTypeFrom(packetString);
+				switch (packetType) {
+					case UNICAST:
+						packet = UnicastPacket.parse(packetString);
+						break;
+					case BROADCAST:
+						packet = BroadcastPacket.parse(packetString);
+						break;
+					default:
+						throw PacketException.unsupportedPacketType(packetType); // todo: 違うエラー内容の方が良いかな?
+				}
+				message = packet.getBody();
 				System.out.println("[MessageClient] " + message);
 			}
 
@@ -85,27 +92,6 @@ public class MessageClient extends Thread {
 	public void send(int destination, Message message) {
 		UnicastPacket packet = new UnicastPacket(this.address, destination, message);
 		transport(packet);
-	}
-
-
-	private Message waitMessage() throws IOException {
-		String packetString = in.readLine();
-		if (packetString == null) return null;
-
-		// Packetオブジェクト化
-		Packet packet;
-		PacketType packetType = Packet.getTypeFrom(packetString);
-		switch (packetType) {
-			case UNICAST:
-				packet = UnicastPacket.parse(packetString);
-				break;
-			case BROADCAST:
-				packet = BroadcastPacket.parse(packetString);
-				break;
-			default:
-				throw PacketException.unsupportedPacketType(packetType); // todo: 違うエラー内容の方が良いかな?
-		}
-		return packet.getBody();
 	}
 
 	// ================== ゲッター / セッター ==================
