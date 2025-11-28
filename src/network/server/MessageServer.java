@@ -54,7 +54,21 @@ public class MessageServer {
 		}
 	}
 
-	// パッケージプライベート
+	public static void send(String message, int destination) {
+		Packet packet = new Packet(Packet.SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
+		MessageServer.forward(packet);
+	}
+
+	public static void terminateClientProcess(MessageServerProcess client, Exception e) {
+		log("terminateClientProcess","Disconnect from client No."+client.getAddress() +"("+client.getClientName()+")");
+		clients.remove(client.getAddress());
+	}
+
+	public static void registerClient(MessageServerProcess client) {
+		MessageServer.clients.put(client.getAddress(), client);
+	}
+
+	// ================== パッケージプライベート ==================
 	static void forward(Packet packet) {
 		switch (packet.destination) {
 			// ブロードキャスト
@@ -79,20 +93,6 @@ public class MessageServer {
 				break;
 			}
 		}
-	}
-
-	public static void send(String message, int destination) {
-		Packet packet = new Packet(Packet.SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
-		MessageServer.forward(packet);
-	}
-
-	public static void terminateClientProcess(MessageServerProcess client, Exception e) {
-		log("terminateClientProcess","Disconnect from client No."+client.getAddress() +"("+client.getClientName()+")");
-		clients.remove(client.getAddress());
-	}
-
-	public static void registerClient(MessageServerProcess client) {
-		MessageServer.clients.put(client.getAddress(), client);
 	}
 
 //	todo: アドレスが枯渇したときの話。

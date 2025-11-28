@@ -76,13 +76,6 @@ public class MessageClient extends Thread {
 		}
 	}
 
-	// プライベートメソッド
-	private void transport(Packet packet) {
-		out.println(packet);
-		out.flush();
-		log("transport" , packet.toString());
-	}
-
 	public void broadcast(String message) {
 		Packet packet = new Packet(this.address, Packet.BROADCAST_ADDRESS, message);
 		transport(packet);
@@ -100,5 +93,12 @@ public class MessageClient extends Thread {
 
 	public int getAddress() {
 		return this.address;
+	}
+
+	// ================== プライベートメソッド ==================
+	private void transport(Packet packet) {
+		out.println(packet);
+		out.flush();
+		log("transport" , packet.toString());
 	}
 }
