@@ -1,15 +1,14 @@
 package protocol.packet;
 
-import protocol.message.Message;
-
 public interface Packet {
 
-	String getPacketString();
-
+	String format();
 
 	PacketType getType();
 
-	Message getBody();
+	String getBody();
+
+	boolean compareAddress(int address);
 
 	static PacketType getTypeFrom(String packetString) {
 		String[] args = packetString.split(" ");
@@ -19,18 +18,4 @@ public interface Packet {
 			throw PacketException.noSuchPacketType(packetString);
 		}
 	}
-
-	static boolean compareAddress(Packet packet, int address) {
-		switch (packet.getType()) {
-			case BROADCAST:
-				return false;
-			case UNICAST:
-				assert packet instanceof UnicastPacket;
-				UnicastPacket unicastPacket = (UnicastPacket) packet;
-				return unicastPacket.destination == address;
-			default:
-				throw PacketException.unsupportedPacketType(packet.getType());
-		}
-	}
-
 }

@@ -2,7 +2,7 @@ package protocol.message;
 
 public interface Message {
 
-	String getMessageString();
+	String format();
 
 	MessageType getType();
 
@@ -15,19 +15,4 @@ public interface Message {
 		}
 	}
 
-	static Message parse(String bodyString){
-		Message message;
-		MessageType messageType = Message.getTypeFrom(bodyString);
-		switch (messageType) {
-			case BASIC:
-				message = BasicMessage.parse(bodyString);
-				break;
-			case CLIENT_PROFILE:
-				message = ClientProfileMessage.parse(bodyString);
-				break;
-			default:
-				throw MessageException.unsupportedMessageType(messageType);
-		}
-		return message;
-	}
 }

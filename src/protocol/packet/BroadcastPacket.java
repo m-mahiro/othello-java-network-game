@@ -1,26 +1,19 @@
 package protocol.packet;
 
-import protocol.message.*;
-
 public class BroadcastPacket implements Packet {
 
 	public final int source;
-	public final Message body;
+	public final String body;
 
 	private static final PacketType type = PacketType.BROADCAST;
 	private static final int headerSize = 2;
 
-	public BroadcastPacket(int source, Message body) {
+	public BroadcastPacket(int source, String body) {
 		this.source = source;
 		this.body = body;
 	}
 
-	public static BroadcastPacket parse(String packetString) {
-
-		int source;
-		Message body;
-
-
+	public BroadcastPacket(String packetString) {
 		// パケットタイプのエラーハンドリング
 		PacketType type = Packet.getTypeFrom(packetString);
 		if (type != BroadcastPacket.type) {
@@ -33,7 +26,7 @@ public class BroadcastPacket implements Packet {
 			throw PacketException.invalidPacketFormat(packetString);
 		}
 		try {
-			source = Integer.parseInt(args[1]);
+			this.source = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
 			throw PacketException.invalidPacketFormat(packetString);
 		}
@@ -52,10 +45,7 @@ public class BroadcastPacket implements Packet {
 			}
 		}
 		if (count != headerSize) throw PacketException.invalidPacketFormat(packetString);
-		String bodyString = packetString.substring(bodyIndex + 1);
-		body = Message.parse(bodyString);
-
-		return new BroadcastPacket(source, body);
+		this.body = packetString.substring(bodyIndex + 1);
 	}
 
 	public PacketType getType() {
@@ -63,22 +53,27 @@ public class BroadcastPacket implements Packet {
 	}
 
 	@Override
-	public String getPacketString() {
+	public String format() {
 		String str = "";
 		str += BroadcastPacket.type + " ";
 		str += this.source + " ";
-		str += this.body.getMessageString();
+		str += this.body;
 		return str;
 	}
 
 	@Override
-	public Message getBody() {
+	public String getBody() {
 		return body;
 	}
 
 	@Override
+	public boolean compareAddress(int address) {
+		return true;
+	}
+
+	@Override
 	public String toString() {
-		return getPacketString();
+		return format();
 	}
 
 }

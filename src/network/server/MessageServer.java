@@ -1,6 +1,5 @@
 package network.server;
 
-import protocol.message.Message;
 import protocol.packet.*;
 
 import java.io.BufferedReader;
@@ -11,7 +10,7 @@ import java.net.Socket;
 import java.util.HashMap;
 
 public class MessageServer {
-	final private static int maxConnection = 100;
+	final private static int MAX_CONNECTION = 100;
 	private static final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
 	private static final int SERVER_ADDRESS = 0;
 	
@@ -44,6 +43,8 @@ public class MessageServer {
 				MessageServerProcess client = new MessageServerProcess(address, in, out);
 				MessageServer.registerClient(client);
 				log("main" ,"Accept client No." + address);
+
+				if (address > MAX_CONNECTION) throw new RuntimeException("接続数をおーばしました。"); // todo: ちゃんとしたエクセプションに
 			}
 
 		} catch (Exception e) {
@@ -54,7 +55,7 @@ public class MessageServer {
 
 	public static void forward(UnicastPacket packet) {
 		if (packet.destination == SERVER_ADDRESS) {
-			log("forward" ,packet.getPacketString());
+			log("forward" ,packet.format());
 			// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
 			return;
 		}
@@ -67,14 +68,14 @@ public class MessageServer {
 	}
 
 	public static void forward(BroadcastPacket packet) {
-		log("forward" ,packet.getPacketString());
+		log("forward" ,packet.format());
 		// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
 		for (MessageServerProcess client : clients.values()) {
 			client.push(packet);
 		}
 	}
 
-	public static void send(Message message, int destination) {
+	public static void send(String message, int destination) {
 		UnicastPacket packet = new UnicastPacket(SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
 		MessageServer.forward(packet);
 	}

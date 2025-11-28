@@ -1,7 +1,5 @@
 package network.client;
 
-import com.sun.xml.internal.bind.v2.runtime.output.StAXExStreamWriterOutput;
-import protocol.message.*;
 import protocol.packet.*;
 
 import java.io.BufferedReader;
@@ -56,7 +54,7 @@ public class MessageClient extends Thread {
 
 		try {
 			// この処理を関数化してはいけない。run()以外でメッセージを受け取ることを想定していないから。
-			Message message;
+			String body;
 			while (true) {
 				String packetString = in.readLine();
 				if (packetString == null) break;
@@ -66,16 +64,18 @@ public class MessageClient extends Thread {
 				PacketType packetType = Packet.getTypeFrom(packetString);
 				switch (packetType) {
 					case UNICAST:
-						packet = UnicastPacket.parse(packetString);
+						packet = new UnicastPacket(packetString);
 						break;
 					case BROADCAST:
-						packet = BroadcastPacket.parse(packetString);
+						packet = new BroadcastPacket(packetString);
 						break;
 					default:
 						throw PacketException.unsupportedPacketType(packetType);
 				}
-				message = packet.getBody();
-				log("run" ,message.toString());
+
+				// bodyを取得
+				body = packet.getBody();
+				log("run" ,body);
 			}
 
 		} catch (IOException e) {
@@ -91,12 +91,12 @@ public class MessageClient extends Thread {
 		log("transport" , packet.toString());
 	}
 
-	public void broadcast(Message message) {
+	public void broadcast(String message) {
 		BroadcastPacket packet = new BroadcastPacket(this.address, message);
 		transport(packet);
 	}
 
-	public void send(int destination, Message message) {
+	public void send(int destination, String message) {
 		UnicastPacket packet = new UnicastPacket(this.address, destination, message);
 		transport(packet);
 	}

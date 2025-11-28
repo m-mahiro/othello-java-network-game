@@ -1,6 +1,5 @@
 package network.server;
 
-import protocol.message.*;
 import protocol.packet.*;
 
 import java.io.BufferedReader;
@@ -38,16 +37,18 @@ public class MessageServerProcess extends Thread {
 	public void run() {
 		try {
 			// メッセージの受け取りを開始する
-			Message message;
+			String message;
 			while (true) {
 				// メッセージを待つ
 				String packetString = in.readLine();
 				if (packetString == null) break; // ストリームラインの最後
+
+				// Packetインスタンス化
 				PacketType packetType = Packet.getTypeFrom(packetString);
 				switch (packetType) {
 					case UNICAST:
-						UnicastPacket unicastPacket = UnicastPacket.parse(packetString);
-						if (Packet.compareAddress(unicastPacket, this.address)) {
+						UnicastPacket unicastPacket = new UnicastPacket(packetString);
+						if (unicastPacket.compareAddress(this.address)) {
 							message = unicastPacket.body;
 						} else {
 							MessageServer.forward(unicastPacket);
@@ -55,13 +56,13 @@ public class MessageServerProcess extends Thread {
 						}
 						break;
 					case BROADCAST:
-						BroadcastPacket broadcastPacket = BroadcastPacket.parse(packetString);
+						BroadcastPacket broadcastPacket = new BroadcastPacket(packetString);
 						MessageServer.forward(broadcastPacket);
 						continue;
 					default:
 						throw PacketException.unsupportedPacketType(packetType);
 				}
-				log("run" ,message.getMessageString());
+				log("run" ,message);
 			}
 
 		} catch (IOException e) {

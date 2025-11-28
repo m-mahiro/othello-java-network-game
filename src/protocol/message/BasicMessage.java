@@ -19,7 +19,7 @@ public final class BasicMessage implements Message {
 
 		// メッセージタイプのエラーハンドリング
 		try {
-			type = MessageType.valueOf(args[0]);
+			type = Message.getTypeFrom(messageString);
 			if (type != BasicMessage.type) throw MessageException.illegalMessageType(type);
 		} catch (IllegalArgumentException e) {
 			throw MessageException.noSuchMessageType(args[0]);
@@ -45,7 +45,7 @@ public final class BasicMessage implements Message {
 	}
 
 	@Override
-	public String getMessageString() {
+	public String format() {
 		String str = "";
 		str += BasicMessage.type.toString() + " ";
 		str += this.content;
@@ -58,6 +58,6 @@ public final class BasicMessage implements Message {
 	}
 
 	public String toString() {
-		return getMessageString();
+		return format();
 	}
 }

@@ -1,27 +1,21 @@
 package protocol.packet;
 
-import protocol.message.*;
-
 public class UnicastPacket implements Packet {
 
 	public final int source;
 	public final int destination;
-	public final Message body;
+	public final String body;
 
 	private static final PacketType type = PacketType.UNICAST;
 	private static final int headerSize = 3;
 
-	public UnicastPacket(int source, int destination, Message body) {
+	public UnicastPacket(int source, int destination, String body) {
 		this.source = source;
 		this.destination = destination;
 		this.body = body;
 	}
 
-	public static UnicastPacket parse(String packetString) {
-		int source;
-		int destination;
-		Message body;
-
+	public UnicastPacket(String packetString) {
 		// パケットタイプのエラーハンドリング
 		PacketType type = Packet.getTypeFrom(packetString);
 		if (type != UnicastPacket.type) throw PacketException.illegalPacketType(type);
@@ -30,8 +24,8 @@ public class UnicastPacket implements Packet {
 		String[] args = packetString.split(" ");
 		if (args.length < headerSize) throw PacketException.invalidPacketFormat(packetString);
 		try {
-			source = Integer.parseInt(args[1]);
-			destination = Integer.parseInt(args[2]);
+			this.source = Integer.parseInt(args[1]);
+			this.destination = Integer.parseInt(args[2]);
 		} catch (NumberFormatException e) {
 			throw PacketException.invalidPacketFormat(packetString);
 		}
@@ -50,10 +44,7 @@ public class UnicastPacket implements Packet {
 			}
 		}
 		if (count != headerSize) throw PacketException.invalidPacketFormat(packetString);
-		String bodyString = packetString.substring(bodyIndex + 1);
-		body = Message.parse(bodyString);
-
-		return new UnicastPacket(source, destination, body);
+		this.body = packetString.substring(bodyIndex + 1);
 	}
 
 	@Override
@@ -62,23 +53,23 @@ public class UnicastPacket implements Packet {
 	}
 
 	@Override
-	public Message getBody() {
+	public String getBody() {
 		return body;
 	}
 
 	@Override
-	public String getPacketString() {
+	public boolean compareAddress(int address) {
+		return this.destination == address;
+	}
+
+	@Override
+	public String format() {
 		String str = "";
 		str += UnicastPacket.type.toString() + " ";
 		str += this.source + " ";
 		str += this.destination + " ";
-		str += body.getMessageString();
+		str += body;
 		return str;
-	}
-
-	@Override
-	public String toString() {
-		return getPacketString();
 	}
 
 }

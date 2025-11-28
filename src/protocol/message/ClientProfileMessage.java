@@ -46,7 +46,7 @@ public class ClientProfileMessage implements Message {
 	}
 
 	@Override
-	public String getMessageString() {
+	public String format() {
 		String str = "";
 		str += ClientProfileMessage.type.toString() + " ";
 		str += clientName;
@@ -60,7 +60,7 @@ public class ClientProfileMessage implements Message {
 
 	@Override
 	public String toString() {
-		return getMessageString();
+		return format();
 	}
 
 }

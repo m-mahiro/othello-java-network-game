@@ -1,10 +1,7 @@
 package controller.client;
 
-
 import network.client.MessageClient;
-import protocol.message.*;
 import protocol.packet.*;
-
 import java.util.*;
 
 public class MessageSendStub {
@@ -14,11 +11,10 @@ public class MessageSendStub {
 
 		Scanner sc = new Scanner(System.in);
 		while (true) {
-			String input = sc.nextLine();
-			if (input.equalsIgnoreCase("exit")) {
+			String message = sc.nextLine();
+			if (message.equalsIgnoreCase("exit")) {
 				break;
 			}
-			Message message = new BasicMessage(input);
 			Packet packet = new BroadcastPacket(messageClient.getAddress(), message);
 			messageClient.transport(packet);
 		}
