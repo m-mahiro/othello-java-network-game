@@ -1,4 +1,4 @@
-package protocol.packet;
+package network;
 
 public class PacketException extends RuntimeException {
 
@@ -12,14 +12,6 @@ public class PacketException extends RuntimeException {
 
 	public static PacketException invalidPacketFormat(String packetString) {
 		return new PacketException("Invalid header format: " + packetString);
-	}
-
-	public static PacketException illegalPacketType(PacketType type) {
-		return new PacketException("Illegal message type: " + type);
-	}
-
-	public static PacketException unsupportedPacketType(PacketType type) {
-		return new PacketException("Unsupported packet type: " + type);
 	}
 
 }

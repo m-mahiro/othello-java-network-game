@@ -1,10 +1,10 @@
 package controller.client;
 
 
-import network.client.MessageClient;
+import network.MessageClient;
 
 public class OthelloClient {
 	public static void main(String[] args) {
-		MessageClient messageClient = new MessageClient();
+		new MessageClient();
 	}
 }
