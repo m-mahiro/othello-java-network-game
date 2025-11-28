@@ -1,6 +1,6 @@
 package network.server;
 
-import protocol.packet.*;
+import network.Packet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,6 +22,7 @@ public class MessageServerProcess extends Thread {
 
 	}
 
+	// MessageServerからしかインスタンスを生成できない
 	MessageServerProcess(int address, BufferedReader in, PrintWriter out) {
 
 		this.address = address;

@@ -1,6 +1,8 @@
 package network.client;
 
-import protocol.packet.*;
+
+
+import network.Packet;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package protocol.packet;
+package network;
 
 public class PacketException extends RuntimeException {
 

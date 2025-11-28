@@ -1,7 +1,7 @@
 package network.server;
 
-import org.omg.CORBA.ContextList;
-import protocol.packet.*;
+
+import network.Packet;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
