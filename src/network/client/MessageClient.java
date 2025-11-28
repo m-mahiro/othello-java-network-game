@@ -55,6 +55,7 @@ public class MessageClient extends Thread {
 	public void run() {
 
 		try {
+			// この処理を関数化してはいけない。run()以外でメッセージを受け取ることを想定していないから。
 			Message message;
 			while (true) {
 				String packetString = in.readLine();
