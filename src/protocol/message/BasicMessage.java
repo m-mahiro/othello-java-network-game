@@ -29,7 +29,6 @@ public final class BasicMessage implements Message {
 		char[] charArray = messageString.toCharArray();
 		int count = 0;
 		int bodyIndex = -1;
-
 		for (int i = 0; i < charArray.length; i++) {
 			if (charArray[i] == ' ') {
 				count++;
