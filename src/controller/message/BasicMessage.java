@@ -1,35 +1,34 @@
-package protocol.message;
+package controller.message;
 
-public class ClientProfileMessage implements Message {
+public final class BasicMessage implements Message {
 
-	public static final MessageType type = MessageType.CLIENT_PROFILE;
-	public final String clientName;
+	public static final MessageType type = MessageType.BASIC;
+	public final String content;
 
 	private static final int headerSize = 1;
 
-	public ClientProfileMessage(String clientName) {
-		this.clientName = clientName;
+	public BasicMessage(String content) {
+		this.content = content;
 	}
 
-	public static ClientProfileMessage parse(String messageString) {
-
+	public static BasicMessage parse(String messageString) {
 		MessageType type;
-		String name;
+		String content;
 
 		String[] args = messageString.split(" ");
 
 		// メッセージタイプのエラーハンドリング
 		try {
 			type = Message.getTypeFrom(messageString);
-			if (type != ClientProfileMessage.type) throw MessageException.illegalMessageType(type);
+			if (type != BasicMessage.type) throw MessageException.illegalMessageType(type);
 		} catch (IllegalArgumentException e) {
 			throw MessageException.noSuchMessageType(args[0]);
 		}
 
+		// bodyの抽出
 		char[] charArray = messageString.toCharArray();
 		int count = 0;
 		int bodyIndex = -1;
-
 		for (int i = 0; i < charArray.length; i++) {
 			if (charArray[i] == ' ') {
 				count++;
@@ -40,27 +39,25 @@ public class ClientProfileMessage implements Message {
 			}
 		}
 		if (count != headerSize) throw MessageException.invalidMessageFormat(messageString);
-		name = messageString.substring(bodyIndex + 1);
+		content = messageString.substring(bodyIndex + 1);
 
-		return new ClientProfileMessage(name);
+		return new BasicMessage(content);
 	}
 
 	@Override
 	public String format() {
 		String str = "";
-		str += ClientProfileMessage.type.toString() + " ";
-		str += clientName;
+		str += BasicMessage.type.toString() + " ";
+		str += this.content;
 		return str;
 	}
 
 	@Override
 	public MessageType getType() {
-		return ClientProfileMessage.type;
+		return BasicMessage.type;
 	}
 
-	@Override
 	public String toString() {
 		return format();
 	}
-
 }

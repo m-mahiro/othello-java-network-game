@@ -1,4 +1,4 @@
-package protocol.message;
+package controller.message;
 
 public enum MessageType {
 	BASIC,
