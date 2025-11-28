@@ -13,6 +13,8 @@ public class MessageClient extends Thread {
 	private PrintWriter out;
 	private int address;
 	private int threadCount = 0;
+	private String host;
+	private int port;
 
 	private void log(String method, String string) {
 		if (method.equals("()")) {
@@ -22,11 +24,13 @@ public class MessageClient extends Thread {
 		}
 	}
 
-	public MessageClient() {
+	public MessageClient(String host, int port) {
+		this.host = host;
+		this.port = port;
 		try {
 			// 通信路の確立
 			@SuppressWarnings("resource")
-			Socket socket = new Socket("localhost", 10000);
+			Socket socket = new Socket(host, port);
 			InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 			this.in = new BufferedReader(inputStreamReader);
 			this.out = new PrintWriter(socket.getOutputStream());
@@ -70,7 +74,7 @@ public class MessageClient extends Thread {
 
 				// bodyを取得
 				body = packet.getBody();
-				log("run" ,body);
+				log("run" ,"Fetched: " + body);
 			}
 
 		} catch (IOException e) {
@@ -100,11 +104,19 @@ public class MessageClient extends Thread {
 		return this.address;
 	}
 
+	String getHost() {
+		return this.host;
+	}
+
+	int getPort() {
+		return this.port;
+	}
+
 
 	// ================== プライベートメソッド ==================
 	private void transport(Packet packet) {
-		out.println(packet);
+		out.println(packet.format());
 		out.flush();
-		log("transport" , packet.toString());
+		log("transport" , packet.format());
 	}
 }

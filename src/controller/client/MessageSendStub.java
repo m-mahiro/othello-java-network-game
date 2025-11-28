@@ -6,7 +6,7 @@ import java.util.*;
 public class MessageSendStub {
 
 	public static void main(String[] args) {
-		MessageClient messageClient = new MessageClient();
+		MessageClient messageClient = new MessageClient("localhost", 10000);
 
 		Scanner sc = new Scanner(System.in);
 		while (true) {

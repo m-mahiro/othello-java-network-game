@@ -5,6 +5,6 @@ import network.MessageClient;
 
 public class OthelloClient {
 	public static void main(String[] args) {
-		new MessageClient();
+		new MessageClient("localhost", 10000);
 	}
 }

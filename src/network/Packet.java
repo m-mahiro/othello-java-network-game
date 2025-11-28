@@ -9,7 +9,7 @@ public class Packet {
 	public static final int SERVER_ADDRESS = 0;
 	public static final int BROADCAST_ADDRESS = -1;
 
-	private static final int HEADER_SIZE = 3;
+	private static final int HEADER_SIZE = 2;
 
 	public Packet(int source, int destination, String body) {
 		this.source = source;
@@ -24,8 +24,8 @@ public class Packet {
 		String[] args = packetString.split(" ");
 		if (args.length < HEADER_SIZE) throw PacketException.invalidPacketFormat(packetString);
 		try {
-			this.source = Integer.parseInt(args[1]);
-			this.destination = Integer.parseInt(args[2]);
+			this.source = Integer.parseInt(args[0]);
+			this.destination = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
 			throw PacketException.invalidPacketFormat(packetString);
 		}
