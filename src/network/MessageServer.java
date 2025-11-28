@@ -10,8 +10,8 @@ import java.util.HashMap;
 
 public class MessageServer extends Thread {
 
-	private final int MAX_CONNECTION;
-	private final int PORT;
+	private final int maxConnection;
+	private final int port;
 	private final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
 	private int threadCount = 0;
 
@@ -24,8 +24,8 @@ public class MessageServer extends Thread {
 	}
 
 	public MessageServer(int port, int maxConnection) {
-		this.PORT = port;
-		this.MAX_CONNECTION = maxConnection;
+		this.port = port;
+		this.maxConnection = maxConnection;
 		log("()" ,"The Server has launched!");
 		this.start();
 	}
@@ -39,8 +39,11 @@ public class MessageServer extends Thread {
 		int address = 0;
 		try {
 			@SuppressWarnings("resource")
-			ServerSocket server = new ServerSocket(PORT);
+			ServerSocket server = new ServerSocket(port);
 			while (true) {
+				if (address > maxConnection) {
+					continue;
+				}
 
 				// 通信路を確立
 				Socket socket = server.accept();
@@ -54,7 +57,6 @@ public class MessageServer extends Thread {
 				this.registerClient(client);
 				client.start();
 				log("main" ,"Accept client No." + address);
-				if (address > MAX_CONNECTION) throw new RuntimeException("接続数をおーばしました。"); // todo: ちゃんとしたエクセプションに
 			}
 
 		} catch (Exception e) {
@@ -67,32 +69,13 @@ public class MessageServer extends Thread {
 		this.forward(packet);
 	}
 
+	public void broadcast(String message) {
+		Packet packet = new Packet(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS, message);
+		this.forward(packet);
+	}
 
-	// ================== パッケージプライベート ==================
-	void forward(Packet packet) {
-		switch (packet.destination) {
-			// ブロードキャスト
-			case Packet.BROADCAST_ADDRESS: {
-				for (MessageServerProcess client : clients.values()) {
-					client.push(packet);
-				}
-				// ここにbreakがないのはわざと
-			}
-
-			// サーバ宛て
-			case Packet.SERVER_ADDRESS: {
-				// ブロードキャストの場合も、サーバは受信する。
-				System.out.println("Receive: " + packet.format());
-				break;
-			}
-
-			// ユニキャスト
-			default: {
-				MessageServerProcess client = clients.get(packet.destination);
-				client.push(packet);
-				break;
-			}
-		}
+	public int getConcurrentConnections() {
+		return clients.size();
 	}
 
 
@@ -106,6 +89,32 @@ public class MessageServer extends Thread {
 		MessageServer.this.clients.put(client.getAddress(), client);
 	}
 
+	private void forward(Packet packet) {
+		switch (packet.destination) {
+			// ブロードキャスト
+			case Packet.BROADCAST_ADDRESS: {
+				for (MessageServerProcess client : clients.values()) {
+					client.push(packet);
+				}
+				// ここにbreakがないのはわざと
+			}
+
+			// サーバ宛て
+			case Packet.SERVER_ADDRESS: {
+				// ブロードキャストの場合も、サーバは受信する。
+				log("forward", "Receive: " + packet.format());
+				break;
+			}
+
+			// ユニキャスト
+			default: {
+				MessageServerProcess client = clients.get(packet.destination);
+				client.push(packet);
+				break;
+			}
+		}
+	}
+
 
 	// ========================================== インナークラス ================================================
 	// インナークラスである必要がある理由:
@@ -114,7 +123,7 @@ public class MessageServer extends Thread {
 	// =======================================================================================================
 	class MessageServerProcess extends Thread {
 
-		private int address;
+		private final int address;
 		private final BufferedReader in;
 		private final PrintWriter out;
 
@@ -148,10 +157,10 @@ public class MessageServer extends Thread {
 						break; // todo: ここはExceptionを吐くべき?
 					}
 					Packet packet = new Packet(packetString);
+					log("run", "Fetched: " + packet.format());
 
 					// 受け取たパケットは全てMessageServerに任せる
 					MessageServer.this.forward(packet);
-					log("run", "Fetched: " + packet);
 				}
 
 			} catch (IOException e) {
@@ -161,16 +170,12 @@ public class MessageServer extends Thread {
 		}
 
 		void push(Packet packet) {
-			out.println(packet);
+			out.println(packet.format());
 			out.flush();
-			log("push", packet.toString());
+			log("push", packet.format());
 		}
 
 		// ================== ゲッター / セッター ==================
-		void setAddress(int address) {
-			this.address = address;
-		}
-
 		int getAddress() {
 			return this.address;
 		}
