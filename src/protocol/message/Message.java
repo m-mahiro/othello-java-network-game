@@ -26,7 +26,7 @@ public interface Message {
 				message = ClientProfileMessage.parse(bodyString);
 				break;
 			default:
-				throw MessageException.noSuchMessageType(bodyString); // todo: 違うエラー内容の方が良いかな?
+				throw MessageException.unsupportedMessageType(messageType);
 		}
 		return message;
 	}

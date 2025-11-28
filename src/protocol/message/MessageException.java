@@ -18,7 +18,8 @@ public class MessageException extends RuntimeException {
 		return new MessageException("Illegal message type: " + type.toString());
 	}
 
-
-
+	public static MessageException unsupportedMessageType(MessageType type) {
+		return new MessageException("Unsupported message type: " + type);
+	}
 
 }
