@@ -1,8 +1,5 @@
 package protocol.message;
 
-import protocol.packet.PacketException;
-import protocol.packet.PacketType;
-
 public class MessageException extends RuntimeException {
 
 	public MessageException(String message) {
@@ -21,8 +18,8 @@ public class MessageException extends RuntimeException {
 		return new MessageException("Illegal message type: " + type.toString());
 	}
 
-	public static PacketException unsupportedMessageType(MessageType type) {
-		return new PacketException("Unsupported message type: " + type);
+	public static MessageException unsupportedMessageType(MessageType type) {
+		return new MessageException("Unsupported message type: " + type);
 	}
 
 }
