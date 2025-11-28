@@ -47,6 +47,7 @@ public class MessageClient extends Thread {
 		}
 	}
 
+	@Override
 	public void run() {
 		// クライアント一つにつき、1つのスレッドである必要がある
 		threadCount++;

@@ -167,5 +167,4 @@ public class MessageServer {
 			return this.address;
 		}
 	}
-
 }
