@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 public class MessageServerProcess extends Thread {
 
 	private int address;
-	private String clientName;
 	private final BufferedReader in;
 	private final PrintWriter out;
 
@@ -37,8 +36,6 @@ public class MessageServerProcess extends Thread {
 
 	public void run() {
 		try {
-			String message;
-
 			// メッセージの受け取りを開始する
 			while (true) {
 
@@ -65,14 +62,6 @@ public class MessageServerProcess extends Thread {
 	}
 
 	// ================== ゲッター / セッター ==================
-	public void setClientName(String clientName) {
-		this.clientName = clientName;
-	}
-
-	public String getClientName() {
-		return this.clientName;
-	}
-
 	public void setAddress(int address) {
 		this.address = address;
 	}

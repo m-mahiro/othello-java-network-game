@@ -60,7 +60,7 @@ public class MessageServer {
 	}
 
 	public static void terminateClientProcess(MessageServerProcess client, Exception e) {
-		log("terminateClientProcess","Disconnect from client No."+client.getAddress() +"("+client.getClientName()+")");
+		log("terminateClientProcess","Disconnect from client No."+client.getAddress());
 		clients.remove(client.getAddress());
 	}
 
