@@ -1,6 +1,4 @@
-package network.client;
-
-import network.Packet;
+package network;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,7 +59,10 @@ public class MessageClient extends Thread {
 
 				// 文字列を受信する
 				String packetString = in.readLine();
-				if (packetString == null) break; // todo: ここはExceptionを吐くべき?
+				if (packetString == null) {
+					log("run", "ファイルストリームの最後に達しました。スレッドを終了します。");
+					break; // todo: ここはExceptionを吐くべき?
+				}
 
 				// Packetオブジェクト化
 				Packet packet = new Packet(packetString);

@@ -1,6 +1,4 @@
-package network.server;
-
-import network.Packet;
+package network;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -137,7 +135,10 @@ public class MessageServer {
 
 					// パケットを待つ
 					String packetString = in.readLine();
-					if (packetString == null) break; // todo: ここはExceptionを吐くべき?
+					if (packetString == null) {
+						log("run", "ファイルストリームの最後に達しました。スレッドを終了します。");
+						break; // todo: ここはExceptionを吐くべき?
+					}
 					Packet packet = new Packet(packetString);
 
 					// 受け取たパケットは全てMessageServerに任せる

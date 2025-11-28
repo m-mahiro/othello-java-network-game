@@ -1,6 +1,6 @@
 package controller.client;
 
-import network.client.MessageClient;
+import network.MessageClient;
 import protocol.packet.*;
 import java.util.*;
 
