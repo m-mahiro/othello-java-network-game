@@ -1,13 +1,15 @@
 package protocol.packet;
 
-public class Packet implements Packet {
+public class Packet {
 
 	public final int source;
 	public final int destination;
 	public final String body;
 
-	private static final PacketType type = PacketType.UNICAST;
-	private static final int headerSize = 3;
+	public static final int SERVER_ADDRESS = 0;
+	public static final int BROADCAST_ADDRESS = -1;
+
+	private static final int HEADER_SIZE = 3;
 
 	public Packet(int source, int destination, String body) {
 		this.source = source;
@@ -16,13 +18,10 @@ public class Packet implements Packet {
 	}
 
 	public Packet(String packetString) {
-		// パケットタイプのエラーハンドリング
-		PacketType type = Packet.getTypeFrom(packetString);
-		if (type != Packet.type) throw PacketException.illegalPacketType(type);
 
 		// ヘッダーの各要素を取得する
 		String[] args = packetString.split(" ");
-		if (args.length < headerSize) throw PacketException.invalidPacketFormat(packetString);
+		if (args.length < HEADER_SIZE) throw PacketException.invalidPacketFormat(packetString);
 		try {
 			this.source = Integer.parseInt(args[1]);
 			this.destination = Integer.parseInt(args[2]);
@@ -35,37 +34,26 @@ public class Packet implements Packet {
 		int count = 0;
 		int bodyIndex = -1;
 		for (int i = 0; i < charArray.length; i++) {
-			if (charArray[i] == ' ') {
-				count++;
-			}
-			if (count == headerSize) {
+			if (charArray[i] == ' ') count++;
+			if (count == HEADER_SIZE) {
 				bodyIndex = i;
 				break;
 			}
 		}
-		if (count != headerSize) throw PacketException.invalidPacketFormat(packetString);
+		if (count != HEADER_SIZE) throw PacketException.invalidPacketFormat(packetString);
 		this.body = packetString.substring(bodyIndex + 1);
 	}
 
-	@Override
-	public PacketType getType() {
-		return Packet.type;
-	}
-
-	@Override
 	public String getBody() {
 		return body;
 	}
 
-	@Override
 	public boolean compareAddress(int address) {
 		return this.destination == address;
 	}
 
-	@Override
 	public String format() {
 		String str = "";
-		str += Packet.type.toString() + " ";
 		str += this.source + " ";
 		str += this.destination + " ";
 		str += body;
