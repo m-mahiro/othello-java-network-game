@@ -16,39 +16,45 @@ public class MessageClient extends Thread {
 	private BufferedReader in;
 	private PrintWriter out;
 	private int address;
-	private String clientName;
 
 	private final int SERVER_ADDRESS = 0;
+	
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[MessageClient()] " + string);
+		} else {
+			System.out.println("[MessageClient." + method + "()] " + string);
+		}
+	}
 
-	public MessageClient(String clientName) {
-
-		this.clientName = clientName;
-
-		// 通信路の確立
+	public MessageClient() {
 		try {
+			// 通信路の確立
 			@SuppressWarnings("resource")
 			Socket socket = new Socket("localhost", 10000);
 			InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 			this.in = new BufferedReader(inputStreamReader);
 			this.out = new PrintWriter(socket.getOutputStream());
 
+			// サーバからアドレスの通知を受ける
+			this.address = Integer.parseInt(in.readLine());
+			log("()", "Address Config Done! (address: " + this.address + ")");
+
+			// メッセージの受け取りを開始
+			this.start();
+
 		} catch (UnknownHostException e) {
-			System.out.println("[MessageClient] " + "ホストのIPアドレスが判定できません。: " + e);
+			log("()","ホストのIPアドレスが判定できません。: " + e);
 		} catch (IOException e) {
-			System.out.println("[MessageClient] " + "エラーが発生しました。" + e);
+			log("()" ,"エラーが発生しました。" + e);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-
 	public void run() {
 
 		try {
-			// サーバからアドレスの通知を受ける
-			this.address = Integer.parseInt(in.readLine());
-
-			// メッセージの受け取りを開始
 			Message message;
 			while (true) {
 				String packetString = in.readLine();
@@ -65,14 +71,14 @@ public class MessageClient extends Thread {
 						packet = BroadcastPacket.parse(packetString);
 						break;
 					default:
-						throw PacketException.unsupportedPacketType(packetType); // todo: 違うエラー内容の方が良いかな?
+						throw PacketException.unsupportedPacketType(packetType);
 				}
 				message = packet.getBody();
-				System.out.println("[MessageClient] " + message);
+				log("run" ,message.toString());
 			}
 
 		} catch (IOException e) {
-			System.out.println("[MessageClient] " + e.getMessage());
+			log("run" ,e.getMessage());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -81,7 +87,7 @@ public class MessageClient extends Thread {
 	public void transport(Packet packet) {
 		out.println(packet);
 		out.flush();
-		System.out.println("[MessageClient] " + packet);
+		log("transport" , packet.toString());
 	}
 
 	public void broadcast(Message message) {

@@ -10,11 +10,10 @@ import java.util.*;
 public class MessageSendStub {
 
 	public static void main(String[] args) {
-		MessageClient messageClient = new MessageClient("test-user");
+		MessageClient messageClient = new MessageClient();
 
 		Scanner sc = new Scanner(System.in);
 		while (true) {
-			System.out.print("BroadCast: ");
 			String input = sc.nextLine();
 			if (input.equalsIgnoreCase("exit")) {
 				break;

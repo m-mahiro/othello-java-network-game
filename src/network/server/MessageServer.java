@@ -14,13 +14,21 @@ public class MessageServer {
 	final private static int maxConnection = 100;
 	private static final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
 	private static final int SERVER_ADDRESS = 0;
+	
+	private static void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[BroadcastPacket()] " + string);
+		} else {
+			System.out.println("[BroadcastPacket." + method + "()] " + string);
+		}
+
+	}
 
 	public static void main(String[] args) {
-		int address = 1;
-		System.out.println("[MessageServer] " + "The Server has launched!");
+		int address = 0;
+		log("main" ,"The Server has launched!");
 
 		try {
-
 			@SuppressWarnings("resource")
 			ServerSocket server = new ServerSocket(10000);
 			while (true) {
@@ -32,33 +40,34 @@ public class MessageServer {
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
 				// サーバープロセスを生成
+				address++;
 				MessageServerProcess client = new MessageServerProcess(address, in, out);
 				MessageServer.registerClient(client);
-				System.out.println("[MessageServer] " + "Accept client No." + address++);
+				log("main" ,"Accept client No." + address);
 			}
 
 		} catch (Exception e) {
-			System.out.println("[MessageServer] " + "サーバの待ちソケット作成時にエラーが発生しました: " + e);
+			log("main" ,"サーバの待ちソケット作成時にエラーが発生しました: " + e);
 
 		}
 	}
 
 	public static void forward(UnicastPacket packet) {
 		if (packet.destination == SERVER_ADDRESS) {
-			System.out.println("[MessageServer] " + packet.getPacketString());
+			log("forward" ,packet.getPacketString());
 			// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
 			return;
 		}
 		MessageServerProcess destinationClient = clients.get(packet.destination);
 		if (destinationClient == null) {
-			System.out.println("[MessageServer] Error: Destination client with ID " + packet.destination + " does not exist. Packet not delivered.");
+			log("forward", "Error: Destination client with ID " + packet.destination + " does not exist. Packet not delivered.");
 			return;
 		}
 		destinationClient.push(packet);
 	}
 
 	public static void forward(BroadcastPacket packet) {
-		System.out.println("[MessageServer] " + packet.getPacketString());
+		log("forward" ,packet.getPacketString());
 		// todo: ここで、サーバー側のコントローラの何かを呼ぶ(依存関係の方向に注意）
 		for (MessageServerProcess client : clients.values()) {
 			client.push(packet);
@@ -71,7 +80,7 @@ public class MessageServer {
 	}
 
 	public static void terminateClientProcess(MessageServerProcess client, Exception e) {
-		System.out.println("[MessageServer] " + "Disconnect from client No."+client.getAddress() +"("+client.getClientName()+")");
+		log("terminateClientProcess","Disconnect from client No."+client.getAddress() +"("+client.getClientName()+")");
 		clients.remove(client.getAddress());
 	}
 

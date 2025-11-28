@@ -19,14 +19,24 @@ public class MessageServerProcess extends Thread {
 		this.address = address;
 		this.in = in;
 		this.out = out;
+
+		// クライアントにアドレスを通知する。
+		out.println(address);
+
 		this.start();
+	}
+
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[BroadcastPacket()] " + string);
+		} else {
+			System.out.println("[BroadcastPacket." + method + "()] " + string);
+		}
+
 	}
 
 	public void run() {
 		try {
-			// クライアントにアドレスを通知する。
-			out.println(address);
-
 			// メッセージの受け取りを開始する
 			Message message;
 			while (true) {
@@ -51,7 +61,7 @@ public class MessageServerProcess extends Thread {
 					default:
 						throw PacketException.unsupportedPacketType(packetType);
 				}
-				System.out.println("[MessageServerProcess] " + message.getMessageString());
+				log("run" ,message.getMessageString());
 			}
 
 		} catch (IOException e) {
@@ -63,7 +73,7 @@ public class MessageServerProcess extends Thread {
 	public void push(Packet packet) {
 		out.println(packet);
 		out.flush();
-		System.out.println("[MessageServerProcess] " + packet);
+		log("push" ,packet.toString());
 	}
 
 	// ================== ゲッター / セッター ==================
