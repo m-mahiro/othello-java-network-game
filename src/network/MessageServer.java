@@ -18,20 +18,36 @@ public class MessageServer extends Thread {
 	private int threadCount = 0;
 	private final BlockingQueue<Packet> messageQueue = new LinkedBlockingQueue<>();
 
-	private void log(String method, String string) {
-		if (method.equals("()")) {
-			System.out.println("[MessageServer()] " + string);
-		} else {
-			System.out.println("[MessageServer." + method + "()] " + string);
-		}
-	}
-
 	public MessageServer(int port, int maxConnection) {
 		this.port = port;
 		this.maxConnection = maxConnection;
 		log("()" ,"The Server has launched!");
 		this.start();
 	}
+
+	public String nextMessage() {
+		try {
+			Packet packet = this.messageQueue.take();
+			return packet.getBody();
+		} catch (InterruptedException e) {
+			throw new RuntimeException("パケットをキューから取り出す際に割込みが発生しました。: " + e);
+		}
+	}
+
+	public void send(String message, int destination) {
+		Packet packet = new Packet(Packet.SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
+		this.forward(packet);
+	}
+
+	public void broadcast(String message) {
+		Packet packet = new Packet(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS, message);
+		this.forward(packet);
+	}
+
+	public int getConcurrentConnections() {
+		return clients.size();
+	}
+
 
 	@Override
 	public void run() {
@@ -67,28 +83,6 @@ public class MessageServer extends Thread {
 		}
 	}
 
-	public void send(String message, int destination) {
-		Packet packet = new Packet(Packet.SERVER_ADDRESS, destination, message); // 0はサーバのアドレス
-		this.forward(packet);
-	}
-
-	public void broadcast(String message) {
-		Packet packet = new Packet(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS, message);
-		this.forward(packet);
-	}
-
-	public int getConcurrentConnections() {
-		return clients.size();
-	}
-
-	public String nextMessage() {
-		try {
-			Packet packet = this.messageQueue.take();
-			return packet.getBody();
-		} catch (InterruptedException e) {
-			throw new RuntimeException("パケットをキューから取り出す際に割込みが発生しました。: " + e);
-		}
-	}
 
 	// ================== プライベートメソッド ==================
 	private void terminateClientProcess(ClientProcessThread client, Exception e) {
@@ -136,15 +130,6 @@ public class MessageServer extends Thread {
 		private final BufferedReader in;
 		private final PrintWriter out;
 
-		private void log(String method, String string) {
-			if (method.equals("()")) {
-				System.out.println("[ClientProcessThread()] " + string);
-			} else {
-				System.out.println("[ClientProcessThread." + method + "()] " + string);
-			}
-
-		}
-
 		// MessageServerからしかインスタンスを生成できない
 		ClientProcessThread(int address, BufferedReader in, PrintWriter out) {
 			this.address = address;
@@ -188,5 +173,25 @@ public class MessageServer extends Thread {
 		int getAddress() {
 			return this.address;
 		}
+
+		// ================== プライベートメソッド ==================
+		private void log(String method, String string) {
+			if (method.equals("()")) {
+				System.out.println("[ClientProcessThread()] " + string);
+			} else {
+				System.out.println("[ClientProcessThread." + method + "()] " + string);
+			}
+
+		}
 	}
+
+	// ================== プライベートメソッド ==================
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[MessageServer()] " + string);
+		} else {
+			System.out.println("[MessageServer." + method + "()] " + string);
+		}
+	}
+
 }

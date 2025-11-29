@@ -18,6 +18,4 @@ public class MessageSendStub {
 		}
 		sc.close();
 	}
-
-
 }

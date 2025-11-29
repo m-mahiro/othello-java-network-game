@@ -45,10 +45,6 @@ public class Packet {
 		this.body = packetString.substring(bodyIndex + 1);
 	}
 
-	public String getBody() {
-		return body;
-	}
-
 	public String format() {
 		String str = "";
 		str += this.source + " ";
@@ -56,5 +52,11 @@ public class Packet {
 		str += body;
 		return str;
 	}
+
+	// ================== ゲッター / セッター ==================
+	public String getBody() {
+		return body;
+	}
+
 
 }

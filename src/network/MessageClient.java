@@ -16,14 +16,6 @@ public class MessageClient extends Thread {
 	private String host;
 	private int port;
 
-	private void log(String method, String string) {
-		if (method.equals("()")) {
-			System.out.println("[MessageClient()] " + string);
-		} else {
-			System.out.println("[MessageClient." + method + "()] " + string);
-		}
-	}
-
 	public MessageClient(String host, int port) {
 		this.host = host;
 		this.port = port;
@@ -49,6 +41,16 @@ public class MessageClient extends Thread {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void broadcast(String message) {
+		Packet packet = new Packet(this.address, Packet.BROADCAST_ADDRESS, message);
+		transport(packet);
+	}
+
+	public void send(int destination, String message) {
+		Packet packet = new Packet(this.address, destination, message);
+		transport(packet);
 	}
 
 	@Override
@@ -84,16 +86,6 @@ public class MessageClient extends Thread {
 		}
 	}
 
-	public void broadcast(String message) {
-		Packet packet = new Packet(this.address, Packet.BROADCAST_ADDRESS, message);
-		transport(packet);
-	}
-
-	public void send(int destination, String message) {
-		Packet packet = new Packet(this.address, destination, message);
-		transport(packet);
-	}
-
 
 	// ================== ゲッター / セッター ==================
 	public void setAddress(int address) {
@@ -119,4 +111,13 @@ public class MessageClient extends Thread {
 		out.flush();
 		log("transport" , packet.format());
 	}
+
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[MessageClient()] " + string);
+		} else {
+			System.out.println("[MessageClient." + method + "()] " + string);
+		}
+	}
+
 }
