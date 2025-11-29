@@ -36,7 +36,7 @@ public class MessageServer extends Thread {
 		if (threadCount > 1) throw new RuntimeException("2つ以上のスレッドは開始できません。");
 
 		// クライアントの受付を開始
-		int address = 0;
+		int address = Math.max(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS);
 		try {
 			@SuppressWarnings("resource")
 			ServerSocket server = new ServerSocket(port);
@@ -56,11 +56,11 @@ public class MessageServer extends Thread {
 				MessageServerProcess client = new MessageServerProcess(address, in, out);
 				this.registerClient(client);
 				client.start();
-				log("main" ,"Accept client No." + address);
+				log("run" ,"Accept (address: " + address + ")");
 			}
 
 		} catch (Exception e) {
-			log("main" ,"サーバの待ちソケット作成時にエラーが発生しました: " + e);
+			log("run" ,"サーバの待ちソケット作成時にエラーが発生しました: " + e);
 		}
 	}
 
