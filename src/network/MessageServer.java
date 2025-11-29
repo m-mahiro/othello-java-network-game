@@ -7,19 +7,22 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageServer extends Thread {
 
 	private final int maxConnection;
 	private final int port;
-	private final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
+	private final HashMap<Integer, ClientProcessThread> clients = new HashMap<>();
 	private int threadCount = 0;
+	private final BlockingQueue<Packet> messageQueue = new LinkedBlockingQueue<>();
 
 	private void log(String method, String string) {
 		if (method.equals("()")) {
-			System.out.println("[BroadcastPacket()] " + string);
+			System.out.println("[MessageServer()] " + string);
 		} else {
-			System.out.println("[BroadcastPacket." + method + "()] " + string);
+			System.out.println("[MessageServer." + method + "()] " + string);
 		}
 	}
 
@@ -53,7 +56,7 @@ public class MessageServer extends Thread {
 
 				// サーバープロセスを生成
 				address++;
-				MessageServerProcess client = new MessageServerProcess(address, in, out);
+				ClientProcessThread client = new ClientProcessThread(address, in, out);
 				this.registerClient(client);
 				client.start();
 				log("run" ,"Accept (address: " + address + ")");
@@ -78,40 +81,46 @@ public class MessageServer extends Thread {
 		return clients.size();
 	}
 
+	public String nextMessage() {
+		try {
+			Packet packet = this.messageQueue.take();
+			return packet.getBody();
+		} catch (InterruptedException e) {
+			throw new RuntimeException("パケットをキューから取り出す際に割込みが発生しました。: " + e);
+		}
+	}
 
 	// ================== プライベートメソッド ==================
-	private void terminateClientProcess(MessageServerProcess client, Exception e) {
+	private void terminateClientProcess(ClientProcessThread client, Exception e) {
 		log("terminateClientProcess","Disconnect from client No."+client.getAddress());
 		clients.remove(client.getAddress());
 	}
 
-	private void registerClient(MessageServerProcess client) {
+	private void registerClient(ClientProcessThread client) {
 		MessageServer.this.clients.put(client.getAddress(), client);
 	}
 
 	private void forward(Packet packet) {
 		switch (packet.destination) {
-			// ブロードキャスト
-			case Packet.BROADCAST_ADDRESS: {
-				for (MessageServerProcess client : clients.values()) {
-					client.push(packet);
-				}
-				// ここにbreakがないのはわざと
-			}
 
-			// サーバ宛て
-			case Packet.SERVER_ADDRESS: {
-				// ブロードキャストの場合も、サーバは受信する。
+			// ブロードキャスト or サーバ宛て
+			case Packet.BROADCAST_ADDRESS:
+				for (ClientProcessThread client : clients.values()) client.push(packet);
+				// breakがないのはわざと
+			case Packet.SERVER_ADDRESS:
 				log("forward", "Receive: " + packet.format());
+				try {
+					MessageServer.this.messageQueue.put(packet);
+				} catch (InterruptedException e) {
+					throw new RuntimeException("パケットをキューに追加する際に割込みが発生しました。" + e);
+				}
 				break;
-			}
 
 			// ユニキャスト
-			default: {
-				MessageServerProcess client = clients.get(packet.destination);
+			default:
+				ClientProcessThread client = clients.get(packet.destination);
 				client.push(packet);
 				break;
-			}
 		}
 	}
 
@@ -121,7 +130,7 @@ public class MessageServer extends Thread {
 	// このクラスはMessageServerの忠実なしもべなので、ほかの人のいいなりになってはいけないから。
 	// このクラスはMessageClientとMessageServerの架け橋というだけなので、他からアクセスできてはならないから。
 	// =======================================================================================================
-	class MessageServerProcess extends Thread {
+	class ClientProcessThread extends Thread {
 
 		private final int address;
 		private final BufferedReader in;
@@ -129,15 +138,15 @@ public class MessageServer extends Thread {
 
 		private void log(String method, String string) {
 			if (method.equals("()")) {
-				System.out.println("[MessageServerProcess()] " + string);
+				System.out.println("[ClientProcessThread()] " + string);
 			} else {
-				System.out.println("[MessageServerProcess." + method + "()] " + string);
+				System.out.println("[ClientProcessThread." + method + "()] " + string);
 			}
 
 		}
 
 		// MessageServerからしかインスタンスを生成できない
-		MessageServerProcess(int address, BufferedReader in, PrintWriter out) {
+		ClientProcessThread(int address, BufferedReader in, PrintWriter out) {
 			this.address = address;
 			this.in = in;
 			this.out = out;
@@ -172,7 +181,7 @@ public class MessageServer extends Thread {
 		void push(Packet packet) {
 			out.println(packet.format());
 			out.flush();
-			log("push", packet.format());
+			log("push", "Pushed: " + packet.format());
 		}
 
 		// ================== ゲッター / セッター ==================
