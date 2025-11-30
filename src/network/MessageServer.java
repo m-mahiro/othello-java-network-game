@@ -73,8 +73,6 @@ public class MessageServer extends Thread {
 				// サーバープロセスを生成
 				address++;
 				ClientProcessThread client = new ClientProcessThread(address, in, out);
-				this.registerClient(client);
-				client.start();
 				log("run" ,"Accept (address: " + address + ")");
 			}
 
@@ -132,10 +130,18 @@ public class MessageServer extends Thread {
 
 		// MessageServerからしかインスタンスを生成できない
 		ClientProcessThread(int address, BufferedReader in, PrintWriter out) {
+
+			// 初期化
 			this.address = address;
 			this.in = in;
 			this.out = out;
-			out.println(address); // クライアントにアドレスを通知する。;
+
+			// クライアントにアドレスを通知する。;
+			out.println(address);
+
+			// クライアントプロセスをサーバでに登録
+			MessageServer.this.registerClient(this);
+			this.start();
 		}
 
 		@Override
