@@ -6,22 +6,16 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageServer extends Thread {
 
 	private final int maxConnection;
 	private final int port;
-	private final HashMap<Integer, MessageServerProcess> clients = new HashMap<>();
-	private int threadCount = 0;
-
-	private void log(String method, String string) {
-		if (method.equals("()")) {
-			System.out.println("[BroadcastPacket()] " + string);
-		} else {
-			System.out.println("[BroadcastPacket." + method + "()] " + string);
-		}
-	}
+	private final ConcurrentHashMap<Integer, ClientProcessThread> clients = new ConcurrentHashMap<>();
+	private final BlockingQueue<Packet> messageQueue = new LinkedBlockingQueue<>();
 
 	public MessageServer(int port, int maxConnection) {
 		this.port = port;
@@ -30,37 +24,12 @@ public class MessageServer extends Thread {
 		this.start();
 	}
 
-	@Override
-	public void run() {
-		threadCount++;
-		if (threadCount > 1) throw new RuntimeException("2つ以上のスレッドは開始できません。");
-
-		// クライアントの受付を開始
-		int address = 0;
+	public String nextMessage() {
 		try {
-			@SuppressWarnings("resource")
-			ServerSocket server = new ServerSocket(port);
-			while (true) {
-				if (address > maxConnection) {
-					continue;
-				}
-
-				// 通信路を確立
-				Socket socket = server.accept();
-				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
-				BufferedReader in = new BufferedReader(inputStreamReader);
-				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-				// サーバープロセスを生成
-				address++;
-				MessageServerProcess client = new MessageServerProcess(address, in, out);
-				this.registerClient(client);
-				client.start();
-				log("main" ,"Accept client No." + address);
-			}
-
-		} catch (Exception e) {
-			log("main" ,"サーバの待ちソケット作成時にエラーが発生しました: " + e);
+			Packet packet = this.messageQueue.take();
+			return packet.getBody();
+		} catch (InterruptedException e) {
+			throw new RuntimeException("パケットをキューから取り出す際に割込みが発生しました。: " + e);
 		}
 	}
 
@@ -79,39 +48,70 @@ public class MessageServer extends Thread {
 	}
 
 
+	@Override
+	public void run() {
+		// クライアントの受付を開始
+		int address = Math.max(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS);
+		try {
+			@SuppressWarnings("resource")
+			ServerSocket server = new ServerSocket(port);
+			while (true) {
+				if (address > maxConnection) {
+					continue;
+				}
+
+				// 通信路を確立
+				Socket socket = server.accept();
+				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
+				BufferedReader in = new BufferedReader(inputStreamReader);
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+				// サーバープロセスを生成
+				address++;
+				ClientProcessThread client = new ClientProcessThread(address, in, out);
+				this.registerClient(client);
+				client.start();
+				log("run" ,"Accept (address: " + address + ")");
+			}
+
+		} catch (Exception e) {
+			log("run" ,"サーバの待ちソケット作成時にエラーが発生しました: " + e);
+		}
+	}
+
+
 	// ================== プライベートメソッド ==================
-	private void terminateClientProcess(MessageServerProcess client, Exception e) {
+	private void terminateClientProcess(ClientProcessThread client, Exception e) {
 		log("terminateClientProcess","Disconnect from client No."+client.getAddress());
 		clients.remove(client.getAddress());
 	}
 
-	private void registerClient(MessageServerProcess client) {
+	// todo: これ関数化する必要ある?
+	private void registerClient(ClientProcessThread client) {
 		MessageServer.this.clients.put(client.getAddress(), client);
 	}
 
 	private void forward(Packet packet) {
 		switch (packet.destination) {
-			// ブロードキャスト
-			case Packet.BROADCAST_ADDRESS: {
-				for (MessageServerProcess client : clients.values()) {
-					client.push(packet);
-				}
-				// ここにbreakがないのはわざと
-			}
 
-			// サーバ宛て
-			case Packet.SERVER_ADDRESS: {
-				// ブロードキャストの場合も、サーバは受信する。
+			// ブロードキャスト or サーバ宛て
+			case Packet.BROADCAST_ADDRESS:
+				for (ClientProcessThread client : clients.values()) client.push(packet);
+				// breakがないのはわざと
+			case Packet.SERVER_ADDRESS:
 				log("forward", "Receive: " + packet.format());
+				try {
+					MessageServer.this.messageQueue.put(packet);
+				} catch (InterruptedException e) {
+					throw new RuntimeException("パケットをキューに追加する際に割込みが発生しました。" + e);
+				}
 				break;
-			}
 
 			// ユニキャスト
-			default: {
-				MessageServerProcess client = clients.get(packet.destination);
+			default:
+				ClientProcessThread client = clients.get(packet.destination);
 				client.push(packet);
 				break;
-			}
 		}
 	}
 
@@ -120,24 +120,16 @@ public class MessageServer extends Thread {
 	// インナークラスである必要がある理由:
 	// このクラスはMessageServerの忠実なしもべなので、ほかの人のいいなりになってはいけないから。
 	// このクラスはMessageClientとMessageServerの架け橋というだけなので、他からアクセスできてはならないから。
+	// todo: この理由であれば、インナークラスではなく同じファイルのprivateクラスを検討した方が良いかも。その方が可読性高い?変わらない?
 	// =======================================================================================================
-	class MessageServerProcess extends Thread {
+	private class ClientProcessThread extends Thread {
 
 		private final int address;
 		private final BufferedReader in;
 		private final PrintWriter out;
 
-		private void log(String method, String string) {
-			if (method.equals("()")) {
-				System.out.println("[MessageServerProcess()] " + string);
-			} else {
-				System.out.println("[MessageServerProcess." + method + "()] " + string);
-			}
-
-		}
-
 		// MessageServerからしかインスタンスを生成できない
-		MessageServerProcess(int address, BufferedReader in, PrintWriter out) {
+		ClientProcessThread(int address, BufferedReader in, PrintWriter out) {
 			this.address = address;
 			this.in = in;
 			this.out = out;
@@ -172,12 +164,32 @@ public class MessageServer extends Thread {
 		void push(Packet packet) {
 			out.println(packet.format());
 			out.flush();
-			log("push", packet.format());
+			log("push", "Pushed: " + packet.format());
 		}
 
 		// ================== ゲッター / セッター ==================
 		int getAddress() {
 			return this.address;
 		}
+
+		// ================== プライベートメソッド ==================
+		private void log(String method, String string) {
+			if (method.equals("()")) {
+				System.out.println("[ClientProcessThread()] " + string);
+			} else {
+				System.out.println("[ClientProcessThread." + method + "()] " + string);
+			}
+
+		}
 	}
+
+	// ================== プライベートメソッド ==================
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[MessageServer()] " + string);
+		} else {
+			System.out.println("[MessageServer." + method + "()] " + string);
+		}
+	}
+
 }
