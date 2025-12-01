@@ -15,7 +15,4 @@ public interface Command {
 			throw CommandException.noSuchCommandType(commandString);
 		}
 	}
-
-
-
 }
