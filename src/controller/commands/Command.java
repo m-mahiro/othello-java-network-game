@@ -6,6 +6,7 @@ public interface Command {
 
 	CommandType getType();
 
+	// todo: 本当に要るかどうかは要検討
 	static CommandType getTypeFrom(String commandString) {
 		String[] args = commandString.split(" ");
 		try {
@@ -14,5 +15,7 @@ public interface Command {
 			throw CommandException.noSuchCommandType(commandString);
 		}
 	}
+
+
 
 }

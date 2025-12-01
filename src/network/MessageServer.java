@@ -6,16 +6,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageServer extends Thread {
 
 	private final int maxConnection;
 	private final int port;
-	private final HashMap<Integer, ClientProcessThread> clients = new HashMap<>();
-	private int threadCount = 0;
+	private final ConcurrentHashMap<Integer, ClientProcessThread> clients = new ConcurrentHashMap<>();
 	private final BlockingQueue<Packet> messageQueue = new LinkedBlockingQueue<>();
 
 	public MessageServer(int port, int maxConnection) {
@@ -51,9 +50,6 @@ public class MessageServer extends Thread {
 
 	@Override
 	public void run() {
-		threadCount++;
-		if (threadCount > 1) throw new RuntimeException("2つ以上のスレッドは開始できません。");
-
 		// クライアントの受付を開始
 		int address = Math.max(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS);
 		try {
@@ -90,6 +86,7 @@ public class MessageServer extends Thread {
 		clients.remove(client.getAddress());
 	}
 
+	// todo: これ関数化する必要ある?
 	private void registerClient(ClientProcessThread client) {
 		MessageServer.this.clients.put(client.getAddress(), client);
 	}
@@ -123,8 +120,9 @@ public class MessageServer extends Thread {
 	// インナークラスである必要がある理由:
 	// このクラスはMessageServerの忠実なしもべなので、ほかの人のいいなりになってはいけないから。
 	// このクラスはMessageClientとMessageServerの架け橋というだけなので、他からアクセスできてはならないから。
+	// todo: この理由であれば、インナークラスではなく同じファイルのprivateクラスを検討した方が良いかも。その方が可読性高い?変わらない?
 	// =======================================================================================================
-	class ClientProcessThread extends Thread {
+	private class ClientProcessThread extends Thread {
 
 		private final int address;
 		private final BufferedReader in;

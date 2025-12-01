@@ -1,19 +1,24 @@
 package controller.server;
 
+import controller.commands.Command;
+import controller.commands.PlanText;
 import network.MessageServer;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
-public class OthelloServer {
+public class OthelloServer extends Thread {
 
-	public static void main(String[] args) {
+	private final MessageServer messageServer;
+	private final Queue<Command> queue = new LinkedList<>();
+
+	public OthelloServer() {
 
 		// サーバをポート番号10000で、最大接続数50で起動
-		MessageServer messageServer = new MessageServer(10000, 50);
+		this.messageServer = new MessageServer(10000, 50);
 
 		// メッセージの受け取りは別スレッドで行う
-		MessageRecieveThread messageRecieveThread = new MessageRecieveThread(messageServer);
-		messageRecieveThread.start();
 
 		// 標準入力から受け取ったメッセージをブロードキャストする
 		while (true) {
@@ -24,20 +29,15 @@ public class OthelloServer {
 		}
 	}
 
-	static class MessageRecieveThread extends Thread {
-		private final MessageServer messageServer;
+	@Override
+	public void run() {
+		while(true) {
+			String message = this.messageServer.nextMessage();
 
-		MessageRecieveThread(MessageServer messageServer) {
-			this.messageServer = messageServer;
-		}
+			// messageをCommandオブジェクト化
+			// todo: 今はとりあえずPlaneTextだけ。
+			Command command = new PlanText(message);
 
-		@Override
-		public void run() {
-			while (true) {
-				String message = messageServer.nextMessage();
-				System.out.println(message);
-			}
 		}
 	}
-
 }
