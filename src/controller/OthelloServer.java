@@ -1,9 +1,7 @@
-package controller.server;
+package controller;
 
 import network.MessageServer;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
 public class OthelloServer extends Thread {
