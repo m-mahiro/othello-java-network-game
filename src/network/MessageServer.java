@@ -150,6 +150,7 @@ public class MessageServer extends Thread {
 						log("run", "ファイルストリームの最後に達しました。スレッドを終了します。");
 						break; // todo: ここはExceptionを吐くべき?
 					}
+					if (packetString.contains("\n")) throw new RuntimeException("受信内容に改行文字が含まれていました。");
 					Packet packet = new Packet(packetString);
 					log("run", "Fetched: " + packet.format());
 
@@ -164,7 +165,9 @@ public class MessageServer extends Thread {
 		}
 
 		void push(Packet packet) {
-			out.println(packet.format());
+			String message = packet.format();
+			if (message.contains("\n")) throw new RuntimeException("送信内容に改行文字を入れてはいけません。");
+			out.println(message);
 			out.flush();
 			log("push", "Pushed: " + packet.format());
 		}
