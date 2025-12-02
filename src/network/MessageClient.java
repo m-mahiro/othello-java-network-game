@@ -72,6 +72,7 @@ public class MessageClient extends Thread {
 				}
 
 				// Packetオブジェクト化
+				if (packetString.contains("\n")) throw new RuntimeException("受信内容に改行文字が含まれていました。");
 				Packet packet = new Packet(packetString);
 
 				// bodyを取得
@@ -107,7 +108,9 @@ public class MessageClient extends Thread {
 
 	// ================== プライベートメソッド ==================
 	private void transport(Packet packet) {
-		out.println(packet.format());
+		String message = packet.format();
+		if (message.contains("\n")) throw new RuntimeException("送信内容に改行文字を入れてはいけません。");
+		out.println(message);
 		out.flush();
 		log("transport" , packet.format());
 	}
