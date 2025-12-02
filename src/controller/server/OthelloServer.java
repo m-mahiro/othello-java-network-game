@@ -1,7 +1,5 @@
 package controller.server;
 
-import controller.commands.Command;
-import controller.commands.PlanText;
 import network.MessageServer;
 
 import java.util.LinkedList;
@@ -11,7 +9,6 @@ import java.util.Scanner;
 public class OthelloServer extends Thread {
 
 	private final MessageServer messageServer;
-	private final Queue<Command> queue = new LinkedList<>();
 
 	public OthelloServer() {
 
@@ -33,10 +30,6 @@ public class OthelloServer extends Thread {
 	public void run() {
 		while(true) {
 			String message = this.messageServer.nextMessage();
-
-			// messageをCommandオブジェクト化
-			// todo: 今はとりあえずPlaneTextだけ。
-			Command command = new PlanText(message);
 
 		}
 	}
