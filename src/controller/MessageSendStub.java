@@ -1,4 +1,4 @@
-package controller.client;
+package controller;
 
 import network.MessageClient;
 import java.util.*;
