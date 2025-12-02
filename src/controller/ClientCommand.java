@@ -26,6 +26,14 @@ class ClientCommand {
 		type.execute(this.othello, this.commandString);
 	}
 
+	public static String putCoin(int i, int j) {
+		String str = "";
+		str += i + " ";
+		str += j + " ";
+		return str;
+	}
+
+
 	// ========================================== インナークラス ================================================
 	// インナークラスである必要がある理由:
 	//     このクラスはClientCommandからしかアクセスできてはいけないから。
@@ -35,16 +43,10 @@ class ClientCommand {
 	// =======================================================================================================
 	public enum ClientCommandType {
 
-		DOG {
+		PUT_COIN {
 			@Override
 			void execute(Othello othello, String commandString) {
-
-			}
-		},
-		CAT{
-			@Override
-			void execute(Othello othello, String commandString) {
-
+				// todo: 未実装
 			}
 		};
 
