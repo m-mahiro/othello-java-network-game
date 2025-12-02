@@ -26,4 +26,30 @@ class ClientCommand {
 		type.execute(this.othello, this.commandString);
 	}
 
+	// ========================================== インナークラス ================================================
+	// インナークラスである必要がある理由:
+	//     このクラスはClientCommandからしかアクセスできてはいけないから。
+	//     インナークラスにした方がパッケージの構造がシンプルになるから。
+	// ClientCommandからしかアクセスで来てはいけない理由:
+	//     単純に想定していないから。
+	// =======================================================================================================
+	public enum ClientCommandType {
+
+		DOG {
+			@Override
+			void execute(Othello othello, String commandString) {
+
+			}
+		},
+		CAT{
+			@Override
+			void execute(Othello othello, String commandString) {
+
+			}
+		};
+
+		abstract void execute(Othello othello, String commandString);
+
+	}
+
 }
