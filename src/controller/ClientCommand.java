@@ -41,7 +41,7 @@ class ClientCommand {
 	// ClientCommandからしかアクセスで来てはいけない理由:
 	//     単純に想定していないから。
 	// =======================================================================================================
-	public enum ClientCommandType {
+	private enum ClientCommandType {
 
 		PUT_COIN {
 			@Override
