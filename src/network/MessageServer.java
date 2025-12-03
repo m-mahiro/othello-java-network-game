@@ -24,8 +24,6 @@ public class MessageServer extends Thread {
 		this.start();
 	}
 
-	// note: コードアノテーションの実験!!!
-
 	public String nextMessage() {
 		try {
 			Packet packet = this.messageQueue.take();
@@ -81,6 +79,7 @@ public class MessageServer extends Thread {
 		}
 	}
 
+	// todo: final()でソケットをクローズする
 
 	// ================== プライベートメソッド ==================
 	private void terminateClientProcess(ClientProcessThread client, Exception e) {

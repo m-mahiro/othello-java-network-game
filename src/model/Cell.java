@@ -1,33 +1,30 @@
 package model;
 
-public class Cell {
-	private CellStatus cellStatus;
+// パッケージプライベート
+class Cell implements Cloneable {
+
+	private Coin coin;
 
 	Cell () {
-		this.cellStatus = CellStatus.NONE;
+		this.coin = Coin.NONE;
 	}
 
-	public CellStatus getCellStatus() {
-		return this.cellStatus;
+	public Coin getCoin() {
+		return this.coin;
 	}
 
-	public void setCellStatus(CellStatus cellStatus) {
-		if (this.hasCoin()) throw new RuntimeException("this cell already has a coin");
-		this.cellStatus = cellStatus;
+	public void setCoin(Coin coin) throws OthelloModelException {
+		if (this.hasCoin()) throw OthelloModelException.alreadyExistsCoin();
+		this.coin = coin;
 	}
 
 	public boolean hasCoin() {
-		return cellStatus != CellStatus.NONE;
+		return coin != Coin.NONE;
 	}
 
-	public void flip() throws RuntimeException {
-		if (this.cellStatus == CellStatus.BLACK) {
-			this.cellStatus = CellStatus.WHITE;
-		} else if (this.cellStatus == CellStatus.WHITE) {
-			this.cellStatus = CellStatus.BLACK;
-		} else {
-			throw new RuntimeException("this cell has no coin");
-		}
+	public void flip() throws OthelloModelException {
+		this.coin = this.coin.getOpposite();
 	}
+
 }
 
