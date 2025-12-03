@@ -24,6 +24,8 @@ public class MessageServer extends Thread {
 		this.start();
 	}
 
+	// note: コードアノテーションの実験
+
 	public String nextMessage() {
 		try {
 			Packet packet = this.messageQueue.take();
