@@ -24,7 +24,7 @@ public class MessageServer extends Thread {
 		this.start();
 	}
 
-	// note: コードアノテーションの実験
+	// note: コードアノテーションの実験!!!
 
 	public String nextMessage() {
 		try {
