@@ -3,7 +3,7 @@ package controller;
 import network.MessageClient;
 import java.util.*;
 
-public class MessageSendStub {
+public class MessageSendDriver {
 
 	public static void main(String[] args) {
 		MessageClient messageClient = new MessageClient("localhost", 10000);
