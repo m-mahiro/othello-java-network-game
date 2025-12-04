@@ -1,6 +1,6 @@
 package model;
 
-public enum Coin {
+public enum Coin implements Cloneable {
 	BLACK,
 	WHITE,
 	NONE;

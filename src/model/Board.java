@@ -3,7 +3,7 @@ package model;
 import java.util.HashSet;
 
 // パッケージプライベート
-class Board {
+class Board implements Cloneable {
 	private final int BOARD_LENGTH = 8;
 	private final Cell[][] cells = new Cell[BOARD_LENGTH][BOARD_LENGTH];
 
@@ -95,5 +95,20 @@ class Board {
 		}
 
 		return flippableCells;
+	}
+
+	@Override
+	public Board clone() {
+		try {
+			Board clone = (Board) super.clone();
+			for (int i = 0; i < BOARD_LENGTH; i++ ) {
+				for (int j = 0; j < BOARD_LENGTH; j++) {
+					clone.cells[i][j] = this.cells[i][j].clone();
+				}
+			}
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
 	}
 }

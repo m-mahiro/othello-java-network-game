@@ -26,5 +26,13 @@ class Cell implements Cloneable {
 		this.coin = this.coin.getOpposite();
 	}
 
+	@Override
+	public Cell clone() {
+		try {
+			return (Cell) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
+	}
 }
 
