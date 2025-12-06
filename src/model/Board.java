@@ -1,5 +1,7 @@
 package model;
 
+import com.sun.xml.internal.ws.policy.spi.AssertionCreationException;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -41,13 +43,37 @@ public class Board implements Cloneable {
 	}
 
 	public boolean isValidMove(Coin coin, int i, int j) {
+
+		// エラーハンドリング
 		if (coin == Coin.NONE) throw new IllegalArgumentException("coinはNONEではだめ");
 		if (!(0 <= i && i < BOARD_LENGTH && 0 <= j && j < BOARD_LENGTH)) {
 			throw new IllegalArgumentException("Both argument must be [0, " + BOARD_LENGTH +"] (Given i: " + i + ", j: " + j + ")");
 		}
 
-		return !this.getFlippableCells(coin, i, j).isEmpty();
+		// すでにコインが置いてある場所にはもちろんコインを置けない。
+		if (this.cells[i][j].hasCoin()) return false;
 
+		// オセロで1枚以上コインをひっくりかえせる場所にしか、コインを新たに置けない。
+		try {
+			return !this.getFlippableCells(coin, i, j).isEmpty();
+		} catch (OthelloModelException e) {
+			throw new AssertionError(e);
+		}
+	}
+
+	@Override
+	public Board clone() {
+		try {
+			Board clone = (Board) super.clone();
+			for (int i = 0; i < BOARD_LENGTH; i++ ) {
+				for (int j = 0; j < BOARD_LENGTH; j++) {
+					clone.cells[i][j] = this.cells[i][j].clone();
+				}
+			}
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError(e);
+		}
 	}
 
 
@@ -70,44 +96,19 @@ public class Board implements Cloneable {
 		for (Cell cell : flippableCells) cell.flip();
 	}
 
-	public String format() {
-		StringBuilder str = new StringBuilder();
-		for (int i = 0; i < BOARD_LENGTH; i++) {
-			for (int j = 0; j < BOARD_LENGTH; j++) {
-				Coin coin = this.getCoin(i, j);
-				str.append(" ");
-				str.append(coin);
-				str.append(" ");
-			}
-			str.append("\n");
-		}
-		return str.toString();
-	}
-
-	@Override
-	public Board clone() {
-		try {
-			Board clone = (Board) super.clone();
-			for (int i = 0; i < BOARD_LENGTH; i++ ) {
-				for (int j = 0; j < BOARD_LENGTH; j++) {
-					clone.cells[i][j] = this.cells[i][j].clone();
-				}
-			}
-			return clone;
-		} catch (CloneNotSupportedException e) {
-			throw new AssertionError(e);
-		}
-	}
 
 
 	// ============================= プライベートメソッド =============================
-	private ArrayList<Cell> getFlippableCells(Coin myCoin, int i, int j) {
+	private ArrayList<Cell> getFlippableCells(Coin myCoin, int i, int j) throws OthelloModelException {
 		// note: なぜプライベートなのか？
 		//  Cellをあまりdomainパッケージの外にだしたくないから。
 		// note: なぜ返し値がHashMapではなくArrayListなのか？
 		//  将来的に、順番にコインがひっくり返っていくという画面効果を実装するかもしれないから。
+
+		// エラーハンドリング
 		if (myCoin == Coin.NONE) throw new IllegalArgumentException("NONEはだめ");
 		if (!(0 <= i && i < BOARD_LENGTH && 0 <= j && j < BOARD_LENGTH)) throw new IllegalArgumentException("Both argument must be [0, " + BOARD_LENGTH +"] (Given i: " + i + ", j: " + j + ")");
+		if (cells[i][j].hasCoin()) throw OthelloModelException.alreadyExistsCoin();
 
 		// 宣言
 		ArrayList<Cell> flippableCells = new ArrayList<>(); // 最終的にひっくりかえせるセル
@@ -159,5 +160,21 @@ public class Board implements Cloneable {
 
 		return flippableCells;
 	}
+
+	// ============================= デバッグ用 =============================
+	public String format() {
+		StringBuilder str = new StringBuilder();
+		for (int i = 0; i < BOARD_LENGTH; i++) {
+			for (int j = 0; j < BOARD_LENGTH; j++) {
+				Coin coin = this.getCoin(i, j);
+				str.append(" ");
+				str.append(coin);
+				str.append(" ");
+			}
+			str.append("\n");
+		}
+		return str.toString();
+	}
+
 
 }

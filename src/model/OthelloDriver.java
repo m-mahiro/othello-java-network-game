@@ -9,12 +9,14 @@ public class OthelloDriver {
 		Scanner sc = new Scanner(System.in);
 		Othello othello = new Othello(Coin.BLACK);
 
-		for (int tern = 0; tern < 64; tern++) {
+		for (int tern = 0; true; tern++) {
 
 			System.out.println("\n\n");
 
 			if (tern % 2 == 0) {
-				if (othello.hasNoCandidate()) {
+				boolean hasNoCandidates = othello.hasNoCandidate();
+				System.out.println(hasNoCandidates);
+				if (hasNoCandidates) {
 					System.out.println("あなた(" + othello.myCoin + ")のおける場所はありません。");
 					continue;
 				}
@@ -23,6 +25,11 @@ public class OthelloDriver {
 				int n = sc.nextInt();
 				int i = n / 8; // HACK: 本当は定数を使うべき
 				int j = n % 8;
+				if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
+					System.out.println("不適切な入力");
+					tern--;
+					continue;
+				}
 				if (!othello.isValidMove(i, j)) {
 					System.out.println("その場所には置けません。");
 					tern--;
@@ -38,7 +45,9 @@ public class OthelloDriver {
 				}
 
 			} else {
-				if (othello.hasNoCandidateForOpponent()) {
+				boolean hasNoCandidates = othello.hasNoCandidateForOpponent();
+				System.out.println(hasNoCandidates);
+				if (hasNoCandidates) {
 					System.out.println("あいて(" + othello.opponentCoin + ")のおける場所はありません。");
 					continue;
 				}
@@ -48,6 +57,11 @@ public class OthelloDriver {
 				int n = sc.nextInt();
 				int i = n / 8; // HACK: 本当は定数を使うべき
 				int j = n % 8;
+				if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
+					System.out.println("不適切な入力");
+					tern--;
+					continue;
+				}
 				if (!othello.isValidMoveByOpponent(i, j)) {
 					System.out.println("その場所にコインはおけません。");
 				}
@@ -61,6 +75,7 @@ public class OthelloDriver {
 			}
 
 			if (othello.isFinish()) {
+				System.out.println(othello.format(Coin.BLACK)); // 引数は何でもよかった
 
 				Coin winner = null;
 				try {

@@ -51,7 +51,6 @@ public class Othello {
 		this.board = history.pop();
 	}
 
-
 	// ============================= ボードの状態を確認する系のメソッド =============================
 
 	public Coin getWinner() throws OthelloModelException {
@@ -83,6 +82,7 @@ public class Othello {
 			for (int j = 0; j < Board.BOARD_LENGTH; j++) {
 				boolean isValid = this.board.isValidMove(this.myCoin, i, j);
 				if (isValid) {
+					log("[hasNoCandidates]　" + i + ", " + j + "は、置けます。");
 					return false;
 				}
 			}
@@ -95,6 +95,7 @@ public class Othello {
 			for (int j = 0; j < Board.BOARD_LENGTH; j++) {
 				boolean isValid = this.board.isValidMove(this.opponentCoin, i, j);
 				if (isValid) {
+					log("[hasNoCandidates]　" + i + ", " + j + "は、置けます。");
 					return false;
 				}
 			}
@@ -103,10 +104,16 @@ public class Othello {
 	}
 
 	public boolean isValidMove(int i, int j) {
+		if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
+			throw new IllegalArgumentException("Both argument must be [0," + Board.BOARD_LENGTH + "] (Given i: " + i + ", j: " + j + ")");
+		}
 		return this.board.isValidMove(myCoin, i, j);
 	}
 
 	public boolean isValidMoveByOpponent(int i, int j) {
+		if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
+			throw new IllegalArgumentException("Both argument must be [0," + Board.BOARD_LENGTH + "] (Given i: " + i + ", j: " + j + ")");
+		}
 		return this.board.isValidMove(opponentCoin, i, j);
 	}
 
@@ -139,5 +146,9 @@ public class Othello {
 			str.append("\n");
 		}
 		return str.toString();
+	}
+
+	public void log(String str) {
+		System.out.println(str);
 	}
 }
