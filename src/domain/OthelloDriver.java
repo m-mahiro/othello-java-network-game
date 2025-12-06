@@ -1,4 +1,4 @@
-package model;
+package domain;
 
 import java.util.Scanner;
 
@@ -14,13 +14,13 @@ public class OthelloDriver {
 			System.out.println("\n\n");
 
 			if (tern % 2 == 0) {
+				System.out.println(othello.format(othello.myCoin));
 				boolean hasNoCandidates = othello.hasNoCandidate();
 				System.out.println(hasNoCandidates);
 				if (hasNoCandidates) {
 					System.out.println("あなた(" + othello.myCoin + ")のおける場所はありません。");
 					continue;
 				}
-				System.out.println(othello.format(othello.myCoin));
 				System.out.print("あなた(" + othello.myCoin + ")の番です: ");
 				int n = sc.nextInt();
 				int i = n / 8; // HACK: 本当は定数を使うべき
@@ -38,13 +38,14 @@ public class OthelloDriver {
 
 				try {
 					othello.put(i, j);
-				} catch (OthelloModelException e) {
+				} catch (OthelloDomainException e) {
 					e.printStackTrace();
 					tern--;
 					continue;
 				}
 
 			} else {
+				System.out.println(othello.format(othello.opponentCoin));
 				boolean hasNoCandidates = othello.hasNoCandidateForOpponent();
 				System.out.println(hasNoCandidates);
 				if (hasNoCandidates) {
@@ -52,7 +53,6 @@ public class OthelloDriver {
 					continue;
 				}
 
-				System.out.println(othello.format(othello.opponentCoin));
 				System.out.print("あいて(" + othello.opponentCoin + ")の番です: ");
 				int n = sc.nextInt();
 				int i = n / 8; // HACK: 本当は定数を使うべき
@@ -67,7 +67,7 @@ public class OthelloDriver {
 				}
 				try {
 					othello.putOpponent(i, j);
-				} catch (OthelloModelException e) {
+				} catch (OthelloDomainException e) {
 					e.printStackTrace();
 					tern--;
 					continue;
@@ -80,7 +80,7 @@ public class OthelloDriver {
 				Coin winner = null;
 				try {
 					winner = othello.getWinner();
-				} catch (OthelloModelException e) {
+				} catch (OthelloDomainException e) {
 					assert false;
 				}
 

@@ -1,6 +1,4 @@
-package model;
-
-import com.sun.xml.internal.ws.policy.spi.AssertionCreationException;
+package domain;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,7 +24,7 @@ public class Board implements Cloneable {
 			cells[b][b].putCoin(Coin.WHITE);
 			cells[a][b].putCoin(Coin.BLACK);
 			cells[b][a].putCoin(Coin.BLACK);
-		} catch (OthelloModelException e) {
+		} catch (OthelloDomainException e) {
 			throw new AssertionError(e);
 		}
 	}
@@ -56,7 +54,7 @@ public class Board implements Cloneable {
 		// オセロで1枚以上コインをひっくりかえせる場所にしか、コインを新たに置けない。
 		try {
 			return !this.getFlippableCells(coin, i, j).isEmpty();
-		} catch (OthelloModelException e) {
+		} catch (OthelloDomainException e) {
 			throw new AssertionError(e);
 		}
 	}
@@ -79,7 +77,7 @@ public class Board implements Cloneable {
 
 	// ============================= パッケージプライベートメソッド =============================
 
-	void putCoin(Coin coin, int i, int j) throws OthelloModelException {
+	void putCoin(Coin coin, int i, int j) throws OthelloDomainException {
 
 		// note: なぜパッケージプライベートなのか。
 		//  getCoin()とか、isValidMove()とかは、viewそうでも使う可能性があるからパブリックでいい。
@@ -89,7 +87,7 @@ public class Board implements Cloneable {
 		if (coin == Coin.NONE) throw new IllegalArgumentException("The first argument must not be Coin.NONE");
 		if (!(0 <= i && i < BOARD_LENGTH && 0 <= j && j < BOARD_LENGTH)) throw new IllegalArgumentException("Both argument must be [0, " + BOARD_LENGTH +"] (Given i: " + i + ", j: " + j + ")");
 		ArrayList<Cell> flippableCells = this.getFlippableCells(coin, i, j);
-		if (this.getFlippableCells(coin, i, j).isEmpty()) throw OthelloModelException.cannotPutCoin();
+		if (this.getFlippableCells(coin, i, j).isEmpty()) throw OthelloDomainException.cannotPutCoin();
 
 		// プレイヤーが選んだセルにコインを置いてから、ひっくり返せるやつをひっくりかえしていく。
 		this.cells[i][j].putCoin(coin);
@@ -99,7 +97,7 @@ public class Board implements Cloneable {
 
 
 	// ============================= プライベートメソッド =============================
-	private ArrayList<Cell> getFlippableCells(Coin myCoin, int i, int j) throws OthelloModelException {
+	private ArrayList<Cell> getFlippableCells(Coin myCoin, int i, int j) throws OthelloDomainException {
 		// note: なぜプライベートなのか？
 		//  Cellをあまりdomainパッケージの外にだしたくないから。
 		// note: なぜ返し値がHashMapではなくArrayListなのか？
@@ -108,14 +106,14 @@ public class Board implements Cloneable {
 		// エラーハンドリング
 		if (myCoin == Coin.NONE) throw new IllegalArgumentException("NONEはだめ");
 		if (!(0 <= i && i < BOARD_LENGTH && 0 <= j && j < BOARD_LENGTH)) throw new IllegalArgumentException("Both argument must be [0, " + BOARD_LENGTH +"] (Given i: " + i + ", j: " + j + ")");
-		if (cells[i][j].hasCoin()) throw OthelloModelException.alreadyExistsCoin();
+		if (cells[i][j].hasCoin()) throw OthelloDomainException.alreadyExistsCoin();
 
 		// 宣言
 		ArrayList<Cell> flippableCells = new ArrayList<>(); // 最終的にひっくりかえせるセル
 		Coin opponentCoin;                              // 相手のコイン
 		try {
 			opponentCoin = myCoin.getOpposite();
-		} catch (OthelloModelException e) {
+		} catch (OthelloDomainException e) {
 			throw new AssertionError(e); // review 使い方あってる?
 		}
 

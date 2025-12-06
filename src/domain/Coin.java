@@ -1,4 +1,4 @@
-package model;
+package domain;
 
 public enum Coin implements Cloneable {
 	BLACK('○'),
@@ -11,11 +11,11 @@ public enum Coin implements Cloneable {
 		this.marker = marker;
 	}
 
-	public Coin getOpposite() throws OthelloModelException {
+	public Coin getOpposite() throws OthelloDomainException {
 		switch (this) {
 			case BLACK: return WHITE;
 			case WHITE: return BLACK;
-			default: throw OthelloModelException.mustNotBeNONE();
+			default: throw OthelloDomainException.mustNotBeNONE();
 		}
 	}
 

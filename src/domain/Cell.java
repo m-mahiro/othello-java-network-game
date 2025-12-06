@@ -1,4 +1,4 @@
-package model;
+package domain;
 
 // パッケージプライベート
 // review: パッケージプライベートにするぐらいだったら、Boardからしか使われていないのだからBoardのインナークラスにしたらどうなの?
@@ -16,8 +16,8 @@ class Cell implements Cloneable {
 		return this.coin;
 	}
 
-	public void putCoin(Coin coin) throws OthelloModelException {
-		if (this.hasCoin()) throw OthelloModelException.alreadyExistsCoin();
+	public void putCoin(Coin coin) throws OthelloDomainException {
+		if (this.hasCoin()) throw OthelloDomainException.alreadyExistsCoin();
 		this.coin = coin;
 	}
 
@@ -25,7 +25,7 @@ class Cell implements Cloneable {
 		return coin != Coin.NONE;
 	}
 
-	public void flip() throws OthelloModelException {
+	public void flip() throws OthelloDomainException {
 		this.coin = this.coin.getOpposite();
 	}
 

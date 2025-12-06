@@ -1,6 +1,6 @@
 package controller;
 
-import model.Othello;
+import domain.Othello;
 
 class ClientCommand {
 
