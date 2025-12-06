@@ -1,4 +1,4 @@
-package domain;
+package model;
 
 public enum Coin implements Cloneable {
 	BLACK('○'),

@@ -1,6 +1,8 @@
 package controller;
 
-import domain.Othello;
+import model.Othello;
+
+import java.util.Objects;
 
 class ClientCommand {
 
@@ -8,7 +10,7 @@ class ClientCommand {
 	ClientCommandType type;
 	String commandString;
 
-	// todo: エラーハンドリングがばがば
+	// hack: エラーハンドリングがばがば
 	ClientCommand(Othello othello, String message) {
 
 		this.othello = othello;
@@ -35,20 +37,42 @@ class ClientCommand {
 
 
 	// ========================================== インナークラス ================================================
-	// インナークラスである必要がある理由:
+	// NOTE: インナークラスである必要がある理由:
 	//     このクラスはClientCommandからしかアクセスできてはいけないから。
 	//     インナークラスにした方がパッケージの構造がシンプルになるから。
-	// ClientCommandからしかアクセスで来てはいけない理由:
+	// NOTE: ClientCommandからしかアクセスで来てはいけない理由:
 	//     単純に想定していないから。
 	// =======================================================================================================
-	private enum ClientCommandType {
+	enum ClientCommandType {
 
+		OPPONENT_PROFILE {
+			@Override
+			void execute(Othello othello, String commandString) {
+				// TODO:
+			}
+		},
 		PUT_COIN {
 			@Override
 			void execute(Othello othello, String commandString) {
 				// todo: 未実装
 			}
+		},
+		REVERT {
+			@Override
+			void execute(Othello othello, String commandString) {
+
+			}
+		},
+		RESTART {
+			@Override
+			void execute(Othello othello, String commandString) {
+
+			}
 		};
+
+		ClientCommand() {
+
+		}
 
 		abstract void execute(Othello othello, String commandString);
 

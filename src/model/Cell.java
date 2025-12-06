@@ -1,4 +1,4 @@
-package domain;
+package model;
 
 // パッケージプライベート
 // review: パッケージプライベートにするぐらいだったら、Boardからしか使われていないのだからBoardのインナークラスにしたらどうなの?

@@ -1,4 +1,4 @@
-package domain;
+package model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -59,6 +59,28 @@ public class Board implements Cloneable {
 		}
 	}
 
+	public int getWhiteCoins() {
+		int count = 0;
+		for (int i = 0; i < BOARD_LENGTH; i++) {
+			for (int j = 0; j < BOARD_LENGTH; j++) {
+				Coin coin = cells[i][j].getCoin();
+				if (coin == Coin.WHITE) count++;
+			}
+		}
+		return count;
+	}
+
+	public int getBlackCoins() {
+		int count = 0;
+		for (int i = 0; i < BOARD_LENGTH; i++) {
+			for (int j = 0; j < BOARD_LENGTH; j++) {
+				Coin coin = cells[i][j].getCoin();
+				if (coin == Coin.BLACK) count++;
+			}
+		}
+		return count;
+	}
+
 	@Override
 	public Board clone() {
 		try {
@@ -80,7 +102,7 @@ public class Board implements Cloneable {
 	void putCoin(Coin coin, int i, int j) throws OthelloDomainException {
 
 		// note: なぜパッケージプライベートなのか。
-		//  getCoin()とか、isValidMove()とかは、viewそうでも使う可能性があるからパブリックでいい。
+		//  getCoin()とか、isValidMove()とかは、view層でも使う可能性があるからパブリックでいい。
 		//  対して、putCoin()は破壊的な操作だからOthello以外に差せてはいけない操作。
 
 		// エラーハンドリング
@@ -99,7 +121,7 @@ public class Board implements Cloneable {
 	// ============================= プライベートメソッド =============================
 	private ArrayList<Cell> getFlippableCells(Coin myCoin, int i, int j) throws OthelloDomainException {
 		// note: なぜプライベートなのか？
-		//  Cellをあまりdomainパッケージの外にだしたくないから。
+		//  Cellをあまりmodelパッケージの外にだしたくないから。
 		// note: なぜ返し値がHashMapではなくArrayListなのか？
 		//  将来的に、順番にコインがひっくり返っていくという画面効果を実装するかもしれないから。
 
