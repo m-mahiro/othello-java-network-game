@@ -5,21 +5,22 @@ import java.util.Stack;
 
 public class Othello {
 
+	public final Coin myCoin;
+	public final Coin opponentCoin;
+
 	private Board board;
-	private final Coin me;
-	private final Coin opponent;
 	private final Stack<Board> history = new Stack<>();
 	private final int BOARD_LENGTH = 8;
 
 	public Othello(Coin myCoin) {
-		this.me = myCoin;
+		this.myCoin = myCoin;
 		Coin opponentCoin = null;
 		try {
 			opponentCoin = myCoin.getOpposite();
 		} catch (OthelloModelException e) {
 			assert false;
 		}
-		this.opponent = opponentCoin;
+		this.opponentCoin = opponentCoin;
 		this.board = new Board(BOARD_LENGTH);
 		this.history.add(this.board.clone());
 	}
@@ -48,25 +49,38 @@ public class Othello {
 		}
 	}
 
+	public boolean hasCandidate(Coin myCoin) {
+		boolean[][] candidates = this.board.getCandidates(myCoin);
+		for (boolean[] row : candidates) {
+			for (boolean flag : row) {
+				if (flag) {
+					return true;
+				}
+			}
+		}
+		return false;
+
+	}
+
 	public boolean isFinish() {
-		boolean[][] myCandidates = this.board.getCandidates(me);
-		boolean[][] opponentCandidates = this.board.getCandidates(opponent);
-		boolean me = Arrays.stream(myCandidates).allMatch(booleans -> false);
-		boolean opponent = Arrays.stream(opponentCandidates).allMatch(booleans -> false);
-		return me && opponent;
+		boolean me = this.hasCandidate(this.myCoin);
+		boolean opponent = this.hasCandidate(this.opponentCoin);
+		return !me && !opponent;
 	}
 
 	public void put(int i, int j) throws OthelloModelException {
-		if (0 <= i && i < BOARD_LENGTH && 0 <= j && j < BOARD_LENGTH) {
-			this.board.putCoin(me, i, j);
-			this.history.push(this.board);
-		} else {
+		if (!(0 <= i && i < BOARD_LENGTH && 0 <= j && j < BOARD_LENGTH)) {
 			throw new IllegalArgumentException("Both argument must be [0," + BOARD_LENGTH + "] (Given i: " + i + ", j: " + j + ")");
 		}
+		this.board.putCoin(myCoin, i, j);
+		this.history.push(this.board);
 	}
 
 	public void putOpponent(int i, int j) throws OthelloModelException {
-		board.putCoin(opponent, i, j);
+		if (!(0 <= i && i < BOARD_LENGTH && 0 <= j && j < BOARD_LENGTH)) {
+			throw new IllegalArgumentException("Both argument must be [0," + BOARD_LENGTH + "] (Given i: " + i + ", j: " + j + ")");
+		}
+		board.putCoin(opponentCoin, i, j);
 		this.history.push(this.board);
 	}
 
@@ -79,21 +93,21 @@ public class Othello {
 		this.board = history.pop();
 	}
 
-	public String format() {
+	public String format(Coin myCoin) {
 		StringBuilder str = new StringBuilder();
 		for (int i = 0; i < BOARD_LENGTH; i++) {
 			for (int j = 0; j < BOARD_LENGTH; j++) {
 				Coin coin = this.board.getCoin(i, j);
 				switch (coin) {
-					case BLACK: str.append("  ●"); break;
-					case WHITE: str.append("  ○"); break;
+					case BLACK: str.append(" ").append(Coin.BLACK).append(" "); break;
+					case WHITE: str.append(" ").append(Coin.WHITE).append(" "); break;
 					case NONE: {
-						boolean isFlippable = this.board.isAbleToPut(this.me, i, j);
+						boolean isFlippable = this.board.isAbleToPut(myCoin, i, j);
 						if (isFlippable) {
 							int number = i * BOARD_LENGTH + j;
-							str.append(String.format("%3d", number));
+							str.append(String.format("%2d ", number));
 						} else {
-							str.append("   ");
+							str.append(" - ");
 						}
 					}
 				}

@@ -129,8 +129,9 @@ class Board implements Cloneable {
 					cells.add(cell);
 				} else if (cell.getCoin() == myCoin) {
 
-					// 自分のコインで挟まったので間の者を全部ひっくりかえせる
+					// 自分のコインで挟まったので、その方向のひっくりかえせるセルが確定する
 					flippableCells.addAll(cells);
+					break;
 				} else if (cell.getCoin() == Coin.NONE){
 
 					// コインがないセルがあったらそれまでにcellsに追加したセルはひっくりかえせないので次にdirectionに行く。

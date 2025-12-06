@@ -1,9 +1,24 @@
 package model;
 
 public enum Coin implements Cloneable {
-	BLACK,
-	WHITE,
-	NONE;
+	BLACK {
+		@Override
+		public String toString() {
+			return "○";
+		}
+	},
+	WHITE {
+		@Override
+		public String toString() {
+			return "●";
+		}
+	},
+	NONE {
+		@Override
+		public String toString() {
+			return " ";
+		}
+	};
 
 	public Coin getOpposite() throws OthelloModelException {
 		switch (this) {
