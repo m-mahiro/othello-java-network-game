@@ -79,6 +79,7 @@ public class MessageServer extends Thread {
 		}
 	}
 
+	// todo: final()でソケットをクローズする
 
 	// ================== プライベートメソッド ==================
 	private void terminateClientProcess(ClientProcessThread client, Exception e) {
