@@ -13,7 +13,7 @@ class Cell implements Cloneable {
 		return this.coin;
 	}
 
-	public void setCoin(Coin coin) throws OthelloModelException {
+	public void putCoin(Coin coin) throws OthelloModelException {
 		if (this.hasCoin()) throw OthelloModelException.alreadyExistsCoin();
 		this.coin = coin;
 	}
@@ -27,11 +27,21 @@ class Cell implements Cloneable {
 	}
 
 	@Override
+	public String toString() {
+		switch (this.coin) {
+			case WHITE: return "黒";
+			case BLACK: return "白";
+			case NONE: return " ";
+			default: throw new AssertionError();
+		}
+	}
+
+	@Override
 	public Cell clone() {
 		try {
 			return (Cell) super.clone();
 		} catch (CloneNotSupportedException e) {
-			throw new AssertionError();
+			throw new AssertionError(e);
 		}
 	}
 }

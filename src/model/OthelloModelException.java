@@ -5,12 +5,14 @@ public class OthelloModelException extends Exception {
 		super(message);
 	}
 
+	// hack: とりあえず引数全部なしで。
+
 	public static OthelloModelException alreadyExistsCoin() {
 		return new OthelloModelException("A Coin has already exited");
 	}
 
-	public static OthelloModelException noCoin() {
-		return new OthelloModelException("No coin exits");
+	public static OthelloModelException mustNotBeNONE() {
+		return new OthelloModelException("The coin must not be NONE here.");
 	}
 
 	public static OthelloModelException cannotPutCoin() {
@@ -24,5 +26,8 @@ public class OthelloModelException extends Exception {
 	public static OthelloModelException invalidNoneCoin() {
 		return new OthelloModelException("NONE coin is invalid");
 	}
+
+	public static OthelloModelException isNotFinished() {return new OthelloModelException("The Othello game haven't finished");}
+
 }
 

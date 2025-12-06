@@ -4,44 +4,65 @@ import java.util.HashSet;
 
 // パッケージプライベート
 class Board implements Cloneable {
-	private final int BOARD_LENGTH = 8;
-	private final Cell[][] cells = new Cell[BOARD_LENGTH][BOARD_LENGTH];
+	private int boardLength;
+	private final Cell[][] cells;
 
-	public Board () {
-		for (int i = 0; i < BOARD_LENGTH; i++) {
-			for (int j = 0; j < BOARD_LENGTH; j++) {
+	public Board(int boardLength) {
+
+		if (boardLength % 2 == 1) {
+			throw new IllegalArgumentException("一辺のセルの数は偶数である必要があります。");
+		}
+
+		this.boardLength = boardLength;
+		this.cells = new Cell[boardLength][boardLength];
+
+		for (int i = 0; i < boardLength; i++) {
+			for (int j = 0; j < boardLength; j++) {
 				cells[i][j] = new Cell();
 			}
 		}
 		try {
-			cells[3][3].setCoin(Coin.WHITE);
-			cells[4][4].setCoin(Coin.WHITE);
-			cells[3][4].setCoin(Coin.BLACK);
-			cells[4][3].setCoin(Coin.BLACK);
+			int a =  boardLength / 2 - 1;
+			int b = boardLength / 2;
+			cells[a][a].putCoin(Coin.WHITE);
+			cells[b][b].putCoin(Coin.WHITE);
+			cells[a][b].putCoin(Coin.BLACK);
+			cells[b][a].putCoin(Coin.BLACK);
 		} catch (OthelloModelException e) {
-			assert false;
+			throw new AssertionError(e);
 		}
 	}
 
-	private Cell getCell(int i, int j)  {
-		try {
-			return cells[i][j];
-		} catch (IndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Both argument must be [0, 7] (Given i: " + i + "j: " + j + ")");
+	public Coin getCoin(int i, int j) {
+		if (0 <= i && i < boardLength && 0 <= j && j < boardLength) {
+			return this.cells[i][j].getCoin();
+		} else {
+			throw new IllegalArgumentException("Both argument must be [0, " + boardLength +"] (Given i: " + i + ", j: " + j + ")");
 		}
 	}
 
 	public void putCoin(Coin coin, int i, int j) throws OthelloModelException {
+
+		if (coin == Coin.NONE) throw new IllegalArgumentException("NONEではだめ");
+		if (!(0 <= i && i < boardLength && 0 <= j && j < boardLength)) throw new IllegalArgumentException("Both argument must be [0, " + boardLength +"] (Given i: " + i + ", j: " + j + ")");
+
 		HashSet<Cell> flippableCells = this.getFlippableCells(coin, i, j);
+		if (flippableCells.isEmpty()) throw OthelloModelException.cannotPutCoin();
+
+		Cell firstCell = this.cells[i][j];
+		firstCell.putCoin(coin);
+
 		for (Cell cell : flippableCells) {
-			cell.setCoin(coin);
+			cell.flip();
 		}
 	}
 
 	public boolean[][] getCandidates(Coin myCoin) {
-		boolean[][] candidates = new boolean[BOARD_LENGTH][BOARD_LENGTH];
-		for (int i = 0; i < BOARD_LENGTH; i++) {
-			for (int j = 0; j < BOARD_LENGTH; j++) {
+		if (myCoin == Coin.NONE) throw new IllegalArgumentException("coinはNONEではだめ");
+
+		boolean[][] candidates = new boolean[boardLength][boardLength];
+		for (int i = 0; i < boardLength; i++) {
+			for (int j = 0; j < boardLength; j++) {
 				int flippableCells = this.getFlippableCells(myCoin, i, j).size();
 				candidates[i][j] = (flippableCells == 0);
 			}
@@ -49,46 +70,70 @@ class Board implements Cloneable {
 		return candidates;
 	}
 
+	public boolean isAbleToPut(Coin coin, int i, int j) {
+		if (coin == Coin.NONE) throw new IllegalArgumentException("coinはNONEではだめ");
+		if (!(0 <= i && i < boardLength && 0 <= j && j < boardLength)) {
+			throw new IllegalArgumentException("Both argument must be [0, " + boardLength +"] (Given i: " + i + ", j: " + j + ")");
+		}
+
+		return !this.getFlippableCells(coin, i, j).isEmpty();
+
+	}
+
+	/**
+	 * WARNING: 一番初めに置いたセルは結果に含まれない
+	 * @param myCoin
+	 * @param i
+	 * @param j
+	 * @return
+	 */
 	public HashSet<Cell> getFlippableCells(Coin myCoin, int i, int j) {
+
+		if (myCoin == Coin.NONE) throw new IllegalArgumentException("NONEはだめ");
+		if (!(0 <= i && i < boardLength && 0 <= j && j < boardLength)) throw new IllegalArgumentException("Both argument must be [0, " + boardLength +"] (Given i: " + i + ", j: " + j + ")");
 
 		// 宣言
 		HashSet<Cell> flippableCells = new HashSet<>(); // 最終的にひっくりかえせるセル
-		Coin opponentCoin;                       // 相手のコイン
+		Coin opponentCoin;                              // 相手のコイン
 		try {
 			opponentCoin = myCoin.getOpposite();
 		} catch (OthelloModelException e) {
-			throw new IllegalArgumentException("myCoin must not be Coin.NONE");
+			throw new AssertionError(e); // review 使い方あってる?
 		}
 
 		// 上下左右斜めの8方向それぞれについて、ひっくりかえせるコインを探す
-		for (int direction = 0; direction < BOARD_LENGTH; direction++) {
+		for (int direction = 0; direction < boardLength; direction++) {
 
 			// ひっくりかえせるかもしれないコインの集合
 			HashSet<Cell> cells = new HashSet<>();
 
+			int i_dash = i;
+			int j_dash = j;
 			// 基準のセルからdirectionの方向に操作する
 			while(true) {
-				int di = 0, dj = 0;
-
                 // 次のセルを確認しに行く（移動する方向はdirectionに応じて変化）
 				int[][] list = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
-				int i_dash = i + list[direction][0];
-				int j_dash = j + list[direction][1];
-				if (0 <= i_dash && i_dash < 8 && 0 <= j_dash && j_dash < 8) break;
-				Cell cell = this.getCell(i_dash, j_dash);
+				i_dash += list[direction][0];
+				j_dash += list[direction][1];
+				Cell cell;
+				if (0 <= i_dash && i_dash < boardLength && 0 <= j_dash && j_dash < boardLength) {
+					cell = this.cells[i_dash][j_dash];
+				} else {
+					break;
+				}
 
-				// ひっくりかえせるかもしれないので集合に追加
+
 				if (cell.getCoin() == opponentCoin) {
+
+					// ひっくりかえせるかもしれないので集合に追加
 					cells.add(cell);
-				}
+				} else if (cell.getCoin() == myCoin) {
 
-				// 自分のコインで挟まったので間の者を全部ひっくりかえせる
-				else if (cell.getCoin() == myCoin) {
+					// 自分のコインで挟まったので間の者を全部ひっくりかえせる
 					flippableCells.addAll(cells);
-				}
+				} else if (cell.getCoin() == Coin.NONE){
 
-				// コインがないセルがあったらそれまでにcellsに追加したセルはひっくりかえせないので次にdirectionに行く。
-				else if (cell.getCoin() == Coin.NONE){
+					// コインがないセルがあったらそれまでにcellsに追加したセルはひっくりかえせないので次にdirectionに行く。
 					break;
 				}
 			}
@@ -101,14 +146,14 @@ class Board implements Cloneable {
 	public Board clone() {
 		try {
 			Board clone = (Board) super.clone();
-			for (int i = 0; i < BOARD_LENGTH; i++ ) {
-				for (int j = 0; j < BOARD_LENGTH; j++) {
+			for (int i = 0; i < boardLength; i++ ) {
+				for (int j = 0; j < boardLength; j++) {
 					clone.cells[i][j] = this.cells[i][j].clone();
 				}
 			}
 			return clone;
 		} catch (CloneNotSupportedException e) {
-			throw new AssertionError();
+			throw new AssertionError(e);
 		}
 	}
 }

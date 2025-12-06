@@ -9,7 +9,7 @@ public enum Coin implements Cloneable {
 		switch (this) {
 			case BLACK: return WHITE;
 			case WHITE: return BLACK;
-			default: throw OthelloModelException.noCoin();
+			default: throw OthelloModelException.mustNotBeNONE();
 		}
 	}
 
