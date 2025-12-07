@@ -1,6 +1,6 @@
 package network;
 
-public class Packet {
+class Packet {
 
 	public final int source;
 	public final int destination;

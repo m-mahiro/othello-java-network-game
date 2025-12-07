@@ -31,7 +31,7 @@ public class OthelloClient {
 		public void run() {
 			String commandString = this.messageClient.nextMessage();
 			ClientCommand command = new ClientCommand(OthelloClient.this, commandString);
-			command.execute();
+			command.executeOn();
 		}
 
 		public void sendCommand(ClientCommand clientCommand) {

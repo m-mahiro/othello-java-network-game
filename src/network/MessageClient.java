@@ -1,5 +1,7 @@
 package network;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -46,6 +48,11 @@ public class MessageClient {
 
 	public void send(int destination, String message) {
 		Packet packet = new Packet(this.address, destination, message);
+		transport(packet);
+	}
+
+	public void sendToServer(String message) {
+		Packet packet = new Packet(this.address, Packet.SERVER_ADDRESS, message);
 		transport(packet);
 	}
 
