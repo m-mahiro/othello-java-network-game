@@ -79,8 +79,8 @@ class ClientCommander {
 			return sb.toString();
 		}
 
-		public void executeOn(OthelloClient othelloClient) {
-			type.execute(othelloClient, this.arguments);
+		public void executeOn(OthelloClient serverClient) {
+			type.execute(serverClient, this.arguments);
 		}
 
 	}
@@ -98,7 +98,7 @@ class ClientCommander {
 			// REVIEW: 名前がおかしきがする。
 			// サーバからこのコマンドを受け取ることで、対戦相手の通知を受ける。
 			@Override
-			void execute(OthelloClient othelloClient, String[] args) {
+			void execute(OthelloClient serverClient, String[] args) {
 				// TODO:
 			}
 
@@ -109,7 +109,7 @@ class ClientCommander {
 		},
 		PUT_COIN {
 			@Override
-			void execute(OthelloClient othelloClient, String[] args) {
+			void execute(OthelloClient serverClient, String[] args) {
 				// todo: 未実装
 			}
 
@@ -120,7 +120,7 @@ class ClientCommander {
 		},
 		REVERT {
 			@Override
-			void execute(OthelloClient othelloClient, String[] args) {
+			void execute(OthelloClient serverClient, String[] args) {
 
 			}
 
@@ -131,7 +131,7 @@ class ClientCommander {
 		},
 		RESTART {
 			@Override
-			void execute(OthelloClient othelloClient, String[] args) {
+			void execute(OthelloClient serverClient, String[] args) {
 
 			}
 
@@ -141,7 +141,7 @@ class ClientCommander {
 			}
 		};
 
-		abstract void execute(OthelloClient othelloClient, String[] arguments);
+		abstract void execute(OthelloClient serverClient, String[] arguments);
 		abstract int getArgumentSize();
 	}
 
