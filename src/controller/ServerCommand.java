@@ -36,10 +36,24 @@ class ServerCommand {
 	}
 
 
+	// ============================= ServerCommandインスタンスを作成するメソッド群 =============================
+	public ServerCommand registerClient(int address, String name) {
+		ServerCommand.Type type = ServerCommand.Type.REGISTER_CLIENT;
+		String[] args = {Integer.toString(address), name};
+		return new ServerCommand(type, args); // HACK: コマンドの引数に関する知識が、CommandクラスとCommanderとに散らばっている。
+	}
+
+	public ServerCommand searchOpponent() {
+		ServerCommand.Type type = ServerCommand.Type.SEARCH_OPPONENT;
+		String[] args = {};
+		return new ServerCommand(type, args);
+	}
+
+
+
 	// ========================================== インナークラス ================================================
-	// NOTE: 間違ってもstaticクラスにしてはいけない、Typeだけでインスタンスを作成してexecute()できしまうから。
-	// HACK: ↑なんかexecute()できてしまっているけど、一旦無視。
-	// NOTE: CommandIO内で、コマンドをタイプごとに振り分けるのでプライベートクラスではだめ。（パッケージプライベートにする）
+	// NOTE: Typeクラスのexecute()へは、ServerCommandクラスからしかアクセスされたくない。
+	// 外部にexecute()を公開してしまうと、String[] argumentsの知識を前提に使わせることになるから危ない。
 	// =======================================================================================================
 	enum Type {
 

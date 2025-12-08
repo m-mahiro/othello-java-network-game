@@ -16,7 +16,7 @@ class ClientCommand {
 		this.arguments = args;
 	}
 
-	ClientCommand(Type type, String[] arguments) {
+	private ClientCommand(Type type, String[] arguments) {
 		this.type = type;
 		this.arguments = arguments;
 	}
@@ -36,11 +36,38 @@ class ClientCommand {
 	}
 
 
+	// ============================= ClientCommandインスタンスを作成するメソッド群 =============================
+
+	public ClientCommand playWith(int address, String name) {
+		ClientCommand.Type type = ClientCommand.Type.PLAY_WITH;
+		String[] args = {Integer.toString(address), name};
+		return new ClientCommand(type, args);
+	}
+
+	public ClientCommand putCoin(int i, int j) {
+		ClientCommand.Type type = ClientCommand.Type.PUT_COIN;
+		String[] args = {Integer.toString(i), Integer.toString(j)};
+		return new ClientCommand(type, args);
+	}
+
+	public ClientCommand revert() {
+		ClientCommand.Type type = ClientCommand.Type.REVERT;
+		String[] arg = {};
+		return new ClientCommand(type, arg);
+	}
+
+	public ClientCommand restart() {
+		ClientCommand.Type type = ClientCommand.Type.RESTART;
+		String[] arg = {};
+		return new ClientCommand(type, arg);
+	}
+
+
+
 	// ========================================== インナークラス ================================================
-	// NOTE: 間違ってもstaticクラスにしてはいけない、Typeだけでインスタンスを作成してexecute()できしまうから。
-	// NOTE: CommandIO内で、コマンドをタイプごとに振り分けるのでプライベートクラスではだめ。（パッケージプライベートにする）
+	// NOTE: Typeクラスのexecute()へは、ClientCommandからしかアクセスされたくない。
 	// =======================================================================================================
-	enum Type {
+	private enum Type {
 
 		PLAY_WITH {
 			// REVIEW: 名前がおかしきがする。
