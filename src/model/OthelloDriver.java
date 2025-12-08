@@ -12,6 +12,15 @@ public class OthelloDriver {
 		for (int tern = 0; true; tern++) {
 
 			System.out.println("\n\n");
+			System.out.println("n or p");
+			String command = sc.next();
+			switch (command) {
+				case "n": break;
+				case "p":
+					othello.revert();
+					tern -= 2;
+					continue;
+			}
 
 			if (tern % 2 == 0) {
 				System.out.println(othello.format(othello.myCoin));

@@ -31,18 +31,15 @@ class Cell implements Cloneable {
 
 	@Override
 	public String toString() {
-		switch (this.coin) {
-			case WHITE: return "黒";
-			case BLACK: return "白";
-			case NONE: return " ";
-			default: throw new AssertionError();
-		}
+		return this.coin.toString();
 	}
 
 	@Override
 	public Cell clone() {
 		try {
-			return (Cell) super.clone();
+			Cell clone = (Cell) super.clone();
+			clone.coin = this.coin;
+			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError(e);
 		}

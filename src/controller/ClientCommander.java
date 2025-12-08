@@ -50,7 +50,8 @@ class ClientCommander {
 
 	// ============================= インナークラス =============================
 	// クライアントで実行されるコマンド
-	public class ClientCommand {
+	// todo: staticクラスについてちゃんと調べておく。
+	public static class ClientCommand {
 
 		private final ClientCommandType type;
 		private final String[] arguments;

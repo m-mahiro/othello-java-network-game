@@ -20,7 +20,6 @@ public class Othello {
 		}
 		this.opponentCoin = opponentCoin;
 		this.board = new Board();
-		this.history.add(this.board.clone());
 	}
 
 
@@ -30,16 +29,16 @@ public class Othello {
 		if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
 			throw new IllegalArgumentException("Both argument must be [0," + Board.BOARD_LENGTH + "] (Given i: " + i + ", j: " + j + ")");
 		}
+		this.history.push(this.board.clone());
 		this.board.putCoin(myCoin, i, j);
-		this.history.push(this.board);
 	}
 
 	public void putOpponent(int i, int j) throws OthelloDomainException {
 		if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
 			throw new IllegalArgumentException("Both argument must be [0," + Board.BOARD_LENGTH + "] (Given i: " + i + ", j: " + j + ")");
 		}
+		this.history.push(this.board.clone());
 		board.putCoin(opponentCoin, i, j);
-		this.history.push(this.board);
 	}
 
 	public void restart() {
@@ -50,6 +49,7 @@ public class Othello {
 	public void revert() {
 		this.board = history.pop();
 	}
+
 
 	// ============================= ボードの状態を確認する系のメソッド =============================
 

@@ -6,7 +6,7 @@ import java.util.HashSet;
 
 public class Board implements Cloneable {
 	public static final int BOARD_LENGTH = 8;
-	private final Cell[][] cells;
+	private Cell[][] cells;
 
 	public Board() {
 
@@ -85,11 +85,13 @@ public class Board implements Cloneable {
 	public Board clone() {
 		try {
 			Board clone = (Board) super.clone();
+			Cell[][] cloneCells = new Cell[BOARD_LENGTH][BOARD_LENGTH];
 			for (int i = 0; i < BOARD_LENGTH; i++ ) {
 				for (int j = 0; j < BOARD_LENGTH; j++) {
-					clone.cells[i][j] = this.cells[i][j].clone();
+					cloneCells[i][j] = this.cells[i][j].clone();
 				}
 			}
+			clone.cells = cloneCells;
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError(e);
