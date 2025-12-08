@@ -16,6 +16,7 @@ class ServerCommand {
 		this.arguments = args;
 	}
 
+	// hack: エラーハンドリングがばがば
 	ServerCommand(Type type, String[] arguments) {
 		this.type = type;
 		this.arguments = arguments;
@@ -31,7 +32,7 @@ class ServerCommand {
 		return sb.toString();
 	}
 
-	public void executeOn(OthelloClient serverClient) {
+	public void executeOn(OthelloServer serverClient) {
 		type.execute(serverClient, this.arguments);
 	}
 
@@ -59,29 +60,18 @@ class ServerCommand {
 
 		REGISTER_CLIENT {
 			@Override
-			void execute(OthelloClient serverClient, String[] arguments) {
+			void execute(OthelloServer othelloServer, String[] arguments) {
 
-			}
-
-			@Override
-			int getArgumentSize() {
-				return 0;
 			}
 		},
 		SEARCH_OPPONENT {
 			@Override
-			void execute(OthelloClient serverClient, String[] arguments) {
+			void execute(OthelloServer othelloServer, String[] arguments) {
 
-			}
-
-			@Override
-			int getArgumentSize() {
-				return 0;
 			}
 		};
 
-		abstract void execute(OthelloClient serverClient, String[] arguments);
-		abstract int getArgumentSize();
+		abstract void execute(OthelloServer othelloServer, String[] arguments);
 	}
 
 }

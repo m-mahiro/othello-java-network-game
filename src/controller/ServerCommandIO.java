@@ -13,7 +13,6 @@ class ServerCommandIO extends Thread{
 	private final BlockingQueue<ServerCommand> serverCommandQueue = new LinkedBlockingQueue<>();
 
 	ServerCommandIO() {
-		// NOTE: MessageIOを作成するのは自分自身。コントローラのリーダーに任せない。
 		this.messageServer = new MessageServer(10000, 100);
 	}
 

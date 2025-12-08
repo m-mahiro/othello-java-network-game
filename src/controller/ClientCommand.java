@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 class ClientCommand {
 
-	public final Type type; // SMELL: フィールドがパブリック(finalだからまだセーフ？)
+	final Type type; // SMELL: フィールドがパブリック(finalだからまだセーフ？)
 	private final String[] arguments;
 
 	// hack: エラーハンドリングがばがば
@@ -21,7 +21,7 @@ class ClientCommand {
 		this.arguments = arguments;
 	}
 
-	public String format() {
+	String format() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.type.toString());
 		for (String arg : this.arguments) {
@@ -31,32 +31,32 @@ class ClientCommand {
 		return sb.toString();
 	}
 
-	public void executeOn(OthelloClient serverClient) {
-		type.execute(serverClient, this.arguments);
+	void executeOn(OthelloClient othelloClient) {
+		type.execute(othelloClient, this.arguments);
 	}
 
 
 	// ============================= ClientCommandインスタンスを作成するメソッド群 =============================
 
-	public ClientCommand playWith(int address, String name) {
+	static ClientCommand playWith(int address, String name) {
 		ClientCommand.Type type = ClientCommand.Type.PLAY_WITH;
 		String[] args = {Integer.toString(address), name};
 		return new ClientCommand(type, args);
 	}
 
-	public ClientCommand putCoin(int i, int j) {
+	static ClientCommand putCoin(int i, int j) {
 		ClientCommand.Type type = ClientCommand.Type.PUT_COIN;
 		String[] args = {Integer.toString(i), Integer.toString(j)};
 		return new ClientCommand(type, args);
 	}
 
-	public ClientCommand revert() {
+	static ClientCommand revert() {
 		ClientCommand.Type type = ClientCommand.Type.REVERT;
 		String[] arg = {};
 		return new ClientCommand(type, arg);
 	}
 
-	public ClientCommand restart() {
+	static ClientCommand restart() {
 		ClientCommand.Type type = ClientCommand.Type.RESTART;
 		String[] arg = {};
 		return new ClientCommand(type, arg);

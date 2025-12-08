@@ -116,6 +116,16 @@ public class MessageServer extends Thread {
 		}
 	}
 
+	// ================== デバッグ用 ==================
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[MessageServer()] " + string);
+		} else {
+			System.out.println("[MessageServer." + method + "()] " + string);
+		}
+	}
+
+
 
 	// ========================================== インナークラス ================================================
 	// インナークラスである必要がある理由:
@@ -188,14 +198,4 @@ public class MessageServer extends Thread {
 
 		}
 	}
-
-	// ================== プライベートメソッド ==================
-	private void log(String method, String string) {
-		if (method.equals("()")) {
-			System.out.println("[MessageServer()] " + string);
-		} else {
-			System.out.println("[MessageServer." + method + "()] " + string);
-		}
-	}
-
 }
