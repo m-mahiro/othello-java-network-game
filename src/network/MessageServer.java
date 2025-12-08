@@ -38,6 +38,7 @@ public class MessageServer extends Thread {
 		this.forward(packet);
 	}
 
+
 	public void broadcast(String message) {
 		Packet packet = new Packet(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS, message);
 		this.forward(packet);
@@ -48,7 +49,6 @@ public class MessageServer extends Thread {
 	}
 
 
-	@Override
 	public void run() {
 		// クライアントの受付を開始
 		int address = Math.max(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS);
@@ -79,7 +79,7 @@ public class MessageServer extends Thread {
 		}
 	}
 
-	// todo: final()でソケットをクローズする
+	// TODO: final()でソケットをクローズする
 
 	// ================== プライベートメソッド ==================
 	private void terminateClientProcess(ClientProcessThread client, Exception e) {
@@ -87,7 +87,7 @@ public class MessageServer extends Thread {
 		clients.remove(client.getAddress());
 	}
 
-	// todo: これ関数化する必要ある?
+	// REVIEW: これ関数化する必要ある?
 	private void registerClient(ClientProcessThread client) {
 		MessageServer.this.clients.put(client.getAddress(), client);
 	}

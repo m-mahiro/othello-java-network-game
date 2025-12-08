@@ -5,7 +5,7 @@ public enum Coin implements Cloneable {
 	WHITE('●'),
 	NONE('-');
 
-	private char marker;
+	private final char marker;
 
 	Coin(char marker) {
 		this.marker = marker;

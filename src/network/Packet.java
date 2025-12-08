@@ -1,13 +1,11 @@
 package network;
 
-public class Packet {
-
-	// パブック
-	// HACK: SERVER_ADDRESSだけパッケージ外に公開する。
-	public static final int SERVER_ADDRESS = 0;
+class Packet {
 
 	// パッケージプライベート
-	final int source;
+	// SMELL: プライベートではないフィールド
+	static final int SERVER_ADDRESS = 0;
+	private final int source;
 	final int destination;
 	final String body;
 	static final int BROADCAST_ADDRESS = -1;
@@ -23,6 +21,7 @@ public class Packet {
 		this.source = source;
 		this.destination = destination;
 		this.body = body;
+
 	}
 
 	Packet(String packetString) {
