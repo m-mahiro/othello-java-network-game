@@ -6,11 +6,10 @@ public class OthelloServer extends Thread {
 
 	private final ServerCommandIO serverCommandIO;
 
-	public OthelloServer() {
-		this.serverCommandIO = new ServerCommandIO(new MessageServer(10000, 100));
-		this.start();
-//		CommandReceiveThread thread = new CommandReceiveThread();
-//		thread.start();
+	public OthelloServer(MessageServer messageServer) {
+		this.serverCommandIO = new ServerCommandIO(messageServer);
+		CommandReceiveThread thread = new CommandReceiveThread();
+		thread.start();
 	}
 
 

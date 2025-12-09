@@ -17,7 +17,7 @@ class ServerCommand {
 	}
 
 	// hack: エラーハンドリングがばがば
-	ServerCommand(Type type, String[] arguments) {
+	private ServerCommand(Type type, String[] arguments) {
 		this.type = type;
 		this.arguments = arguments;
 	}
@@ -38,13 +38,13 @@ class ServerCommand {
 
 
 	// ============================= ServerCommandインスタンスを作成するメソッド群 =============================
-	public ServerCommand registerClient(int address, String name) {
+	public static ServerCommand registerClient(int address, String name) {
 		ServerCommand.Type type = ServerCommand.Type.REGISTER_CLIENT;
 		String[] args = {Integer.toString(address), name};
 		return new ServerCommand(type, args); // HACK: コマンドの引数に関する知識が、CommandクラスとCommanderとに散らばっている。
 	}
 
-	public ServerCommand searchOpponent() {
+	public static ServerCommand searchOpponent() {
 		ServerCommand.Type type = ServerCommand.Type.SEARCH_OPPONENT;
 		String[] args = {};
 		return new ServerCommand(type, args);

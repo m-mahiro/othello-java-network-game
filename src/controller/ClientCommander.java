@@ -14,25 +14,25 @@ class ClientCommander {
 
 	void playWith(int address, String name) {
 		ClientCommand command = ClientCommand.playWith(address, name);
-		this.push(command);
+		this.issue(command);
 	}
 
 	void putCoin(int i, int j) {
 		ClientCommand command = ClientCommand.putCoin(i, j);
-		this.push(command);
+		this.issue(command);
 	}
 
 	void revert() {
 		ClientCommand command = ClientCommand.revert();
-		this.push(command);
+		this.issue(command);
 	}
 
 	void restart() {
 		ClientCommand command = ClientCommand.restart();
-		this.push(command);
+		this.issue(command);
 	}
 
-	private void push(ClientCommand command) {
+	private void issue(ClientCommand command) {
 		clientCommandIO.push(command, opponentAddress);
 	}
 }

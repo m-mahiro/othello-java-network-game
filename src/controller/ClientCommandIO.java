@@ -29,6 +29,16 @@ class ClientCommandIO extends Thread {
 		}
 	}
 
+	void push(ClientCommand clientCommand, int clientAddress) {
+		String message = CommandHeader.CLIENT_COMMAND.toString() + clientCommand.format();
+		this.messageClient.send(message, clientAddress);
+	}
+
+	void push(ServerCommand serverCommand) {
+		String message = CommandHeader.SERVER_COMMAND.toString() + serverCommand.format();
+		this.messageClient.sendToServer(message);
+	}
+
 	@Override
 	public void run() {
 
@@ -45,15 +55,6 @@ class ClientCommandIO extends Thread {
 		}
 	}
 
-	void push(ClientCommand clientCommand, int clientAddress) {
-		String message = CommandHeader.CLIENT_COMMAND.toString() + clientCommand.format();
-		this.messageClient.send(message, clientAddress);
-	}
-
-	void push(ServerCommand serverCommand) {
-		String message = CommandHeader.SERVER_COMMAND.toString() + serverCommand.format();
-		this.messageClient.sendToServer(message);
-	}
 
 
 	// ============================= デバッグ用 =============================

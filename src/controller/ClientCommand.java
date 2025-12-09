@@ -1,9 +1,6 @@
 package controller;
 
-import sun.rmi.runtime.Log;
-
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 class ClientCommand {
 
@@ -19,6 +16,7 @@ class ClientCommand {
 		this.arguments = args;
 	}
 
+	// hack: エラーハンドリングがばがば
 	private ClientCommand(Type type, String[] arguments) {
 		this.type = type;
 		this.arguments = arguments;

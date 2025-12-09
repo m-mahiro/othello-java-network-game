@@ -5,7 +5,7 @@ import network.MessageServer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-class ServerCommandIO extends Thread{
+class ServerCommandIO extends Thread {
 
 	private final MessageServer messageServer; // この部分だけ具象クラスで共通していない。
 
@@ -19,10 +19,6 @@ class ServerCommandIO extends Thread{
 		this.messageServer = messageServer;
 	}
 
-	void push(ClientCommand clientCommand, int clientAddress) {
-		this.messageServer.send(clientCommand.format(), clientAddress);
-	}
-
 	ServerCommand nextServerCommand() {
 		try {
 			return this.serverCommandQueue.take();
@@ -30,6 +26,11 @@ class ServerCommandIO extends Thread{
 			throw new RuntimeException("サーバコマンドをキューから取り出す際に割込みが発生しました。");
 		}
 	}
+
+	void push(ClientCommand clientCommand, int clientAddress) {
+		this.messageServer.send(clientCommand.format(), clientAddress);
+	}
+
 
 	@Override
 	public void run() {

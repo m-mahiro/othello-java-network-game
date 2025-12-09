@@ -4,18 +4,20 @@ import model.Coin;
 import model.Othello;
 import network.MessageClient;
 
-import java.util.Scanner;
-
 public class OthelloClient extends Thread {
 
 	private final MessageClient messageClient; // SMELL: レイヤーとばしてる。折角CommandIOで隠ぺいしたのに。
 	private final ClientCommandIO clientCommandIO;
 	private final Othello othello;
 
-	public OthelloClient() {
-		this.messageClient = new MessageClient("localhost", 10000);
+	public OthelloClient(MessageClient messageClient) {
+
+		// 初期化
+		this.messageClient = messageClient;
 		this.clientCommandIO = new ClientCommandIO(messageClient);
 		this.othello = new Othello(Coin.BLACK);
+
+		// メインロジックは別スレッドで
 		CommandReceiveThread thread = new CommandReceiveThread();
 		thread.start();
 	}
@@ -23,15 +25,12 @@ public class OthelloClient extends Thread {
 	@Override
 	public void run() {
 		// ここにオセロゲームのメインスレッドを記述
-		// できればアクティビティごとにクラスを作成したいけど......絶対間に合わんくなるよな......
 
-		// こちらは送信
-		ClientCommander clientCommander = new ClientCommander(this.messageClient, 1);
-		clientCommander.putCoin(1, 2);
+		ServerCommander serverCommander = new ServerCommander(messageClient);
 
-		Scanner sc = new Scanner(System.in);
-		sc.nextInt();
 
+
+//		(new Scanner(System.in)).nextInt();
 	}
 
 	// ============================= ゲッター/セッター =============================
