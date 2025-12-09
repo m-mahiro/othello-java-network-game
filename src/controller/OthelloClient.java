@@ -2,6 +2,7 @@ package controller;
 
 import model.Coin;
 import model.Othello;
+import network.MessageClient;
 
 public class OthelloClient extends Thread {
 
@@ -9,7 +10,8 @@ public class OthelloClient extends Thread {
 	private final Othello othello;
 
 	public OthelloClient() {
-		this.clientCommandIO = new ClientCommandIO();
+		MessageClient messageClient = new MessageClient("localhost", 10000);
+		this.clientCommandIO = new ClientCommandIO(messageClient);
 		this.othello = new Othello(Coin.BLACK);
 		CommandReceiveThread thread = new CommandReceiveThread();
 		thread.start();
@@ -20,8 +22,9 @@ public class OthelloClient extends Thread {
 		// ここにオセロゲームのメインスレッドを記述
 		// できればアクティビティごとにクラスを作成したいけど......絶対間に合わんくなるよな......
 
-		ClientCommander clientCommander = new ClientCommander();
-
+		// こちらは送信
+		ClientCommander clientCommander = new ClientCommander(2);
+		clientCommander.putCoin(1, 2);
 	}
 
 

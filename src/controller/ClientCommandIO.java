@@ -12,9 +12,9 @@ class ClientCommandIO extends Thread {
 	// NOTE: 排他制御は必要ないけど、取り出すときに空なら追加されるまで待つという特性が便利だからつかう。
 	private final BlockingQueue<ClientCommand> clientCommandQueue = new LinkedBlockingQueue<>();
 
-	ClientCommandIO() {
-		// review: MessageClientが単純にクライアントとサーバをつなぐものなら、CommandIOがMessageClientを起動してもいいと思うけど...
-		this.messageClient = new MessageClient("localhost", 100);
+	ClientCommandIO(MessageClient messageClient) {
+		this.messageClient = messageClient;
+//		this.messageClient = new MessageClient("localhost", 10000); // REVIEW: 引数で受け取った方が良い。けどうまく言語化できない。
 	}
 
 	void push(ClientCommand clientCommand, int clientAddress) {

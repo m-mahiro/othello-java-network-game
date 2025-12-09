@@ -12,8 +12,11 @@ class ServerCommandIO extends Thread{
 	// NOTE: 排他制御は必要ないけど、取り出すときに空なら追加されるまで待つという特性が便利だからつかう。
 	private final BlockingQueue<ServerCommand> serverCommandQueue = new LinkedBlockingQueue<>();
 
-	ServerCommandIO() {
-		this.messageServer = new MessageServer(10000, 100);
+	ServerCommandIO(MessageServer messageServer) {
+		// NOTE: なぜ、ClientCommandIOではコンストラクタ内でMessageClientの起動も行うのに、こちらでは引数として受け取るのか？
+		//  MessageServerが単純にクライアントとサーバをつなぐものなら、CommandIOがMessageServerを起動してもいいと思うけど、
+		//  MessageServerは転送も行うものなので、ここで起動を行うのは越権行為
+		this.messageServer = messageServer;
 	}
 
 	void push(ClientCommand clientCommand, int clientAddress) {

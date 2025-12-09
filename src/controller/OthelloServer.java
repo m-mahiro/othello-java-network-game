@@ -1,17 +1,15 @@
 package controller;
 
-import model.Othello;
 import network.MessageServer;
-
-import java.util.Scanner;
 
 public class OthelloServer extends Thread {
 
 	private final ServerCommandIO serverCommandIO;
 
 	public OthelloServer() {
-		this.serverCommandIO = new ServerCommandIO();
-		CommandRecieveThread thread = new CommandRecieveThread();
+		this.serverCommandIO = new ServerCommandIO(new MessageServer(10000, 100));
+		this.start();
+//		CommandReceiveThread thread = new CommandReceiveThread();
 //		thread.start();
 	}
 
@@ -19,7 +17,8 @@ public class OthelloServer extends Thread {
 	// ============================= インナークラス =============================
 	// NOTE: なぜインナークラスなのか？
 	//  OthelloServerでもスレッドを動かしたいから。
-	private class CommandRecieveThread extends Thread {
+	// =======================================================================
+	private class CommandReceiveThread extends Thread {
 		@Override
 		public void run() {
 			ServerCommand command = serverCommandIO.nextServerCommand();

@@ -1,12 +1,14 @@
 package controller;
 
+import network.MessageClient;
+
 class ClientCommander {
 
 	private final ClientCommandIO clientCommandIO;
 	private final int opponentAddress;
 
-	ClientCommander(int opponentAddress) {
-		this.clientCommandIO = new ClientCommandIO();
+	ClientCommander(MessageClient messageClient, int opponentAddress) {
+		this.clientCommandIO = new ClientCommandIO(messageClient);
 		this.opponentAddress = opponentAddress;
 	}
 
