@@ -1,24 +1,30 @@
 package network;
 
-public class Packet {
+class Packet {
 
-	public final int source;
-	public final int destination;
-	public final String body;
+	// パッケージプライベート
+	// SMELL: プライベートではないフィールド
+	static final int SERVER_ADDRESS = 0;
+	static final int BROADCAST_ADDRESS = -1;
+	final int source;
+	final int destination;
+	final String body;
 
-	public static final int SERVER_ADDRESS = 0;
-	public static final int BROADCAST_ADDRESS = -1;
-
+	// プライベート
 	private static final int HEADER_SIZE = 2;
 
-	public Packet(int source, int destination, String body) {
+
+	// ============================= パッケージプライベート =============================
+	// HACK: メソッドは全てパッケージプライベート。SERVER_ADDRESSだけ、苦渋の決断でnetworkパッケージ外に公開することに。
+	//  CommandIOの開発が関連して、そうしないと都合が悪い。
+	Packet(int source, int destination, String body) {
 		this.source = source;
 		this.destination = destination;
 		this.body = body;
+
 	}
 
-	// todo: このコンストラクタがパブリックはまずい
-	public Packet(String packetString) {
+	Packet(String packetString) {
 
 		// ヘッダーの各要素を取得する
 		String[] args = packetString.split(" ");
@@ -45,7 +51,7 @@ public class Packet {
 		this.body = packetString.substring(bodyIndex + 1);
 	}
 
-	public String format() {
+	String format() {
 		String str = "";
 		str += this.source + " ";
 		str += this.destination + " ";
@@ -54,7 +60,7 @@ public class Packet {
 	}
 
 	// ================== ゲッター / セッター ==================
-	public String getBody() {
+	String getBody() {
 		return body;
 	}
 

@@ -1,34 +1,53 @@
 package controller;
 
-import network.MessageServer;
-
+import model.Coin;
 import java.util.Scanner;
 
 public class OthelloServer extends Thread {
 
-	private final MessageServer messageServer;
-
+	private final ServerCommandIO serverCommandIO;
 	public OthelloServer() {
-
-		// サーバをポート番号10000で、最大接続数50で起動
-		this.messageServer = new MessageServer(10000, 50);
-
-		// メッセージの受け取りは別スレッドで行う
-
-		// 標準入力から受け取ったメッセージをブロードキャストする
-		while (true) {
-			Scanner sc = new Scanner(System.in);
-			String message = sc.nextLine();
-			if (message.equals("exit")) break;
-			messageServer.broadcast(message);
-		}
+		this.serverCommandIO = new ServerCommandIO();
+		CommandReceiveThread thread = new CommandReceiveThread();
+		thread.start();
 	}
 
 	@Override
 	public void run() {
-		while(true) {
-			String message = this.messageServer.nextMessage();
+		Scanner sc = new Scanner(System.in);
+		sc.nextInt();
+		ClientCommander clientCommander = new ClientCommander(this.serverCommandIO, 1);
 
+		clientCommander.playWith(2, "すばる", Coin.BLACK);
+		clientCommander.putCoin(1, 1);
+		clientCommander.restart();
+		clientCommander.revert();
+
+
+		while(true) {}
+	}
+
+	// ============================= インナークラス =============================
+	// NOTE: なぜインナークラスなのか？
+	//  OthelloServerでもスレッドを動かしたいから。
+	// =======================================================================
+	private class CommandReceiveThread extends Thread {
+		@Override
+		public void run() {
+			while(true) {
+				ServerCommand command = serverCommandIO.nextServerCommand();
+				log("run", command.format());
+				command.executeOn(OthelloServer.this);
+			}
+		}
+	}
+
+	// ============================= デバッグ用 =============================
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[OthelloServer()] " + string);
+		} else {
+			System.out.println("[OthelloServer." + method + "()] " + string);
 		}
 	}
 }

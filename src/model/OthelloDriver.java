@@ -1,4 +1,4 @@
-package domain;
+package model;
 
 import java.util.Scanner;
 
@@ -12,6 +12,15 @@ public class OthelloDriver {
 		for (int tern = 0; true; tern++) {
 
 			System.out.println("\n\n");
+			System.out.println("n or p");
+			String command = sc.next();
+			switch (command) {
+				case "n": break;
+				case "p":
+					othello.revert();
+					tern -= 2;
+					continue;
+			}
 
 			if (tern % 2 == 0) {
 				System.out.println(othello.format(othello.myCoin));
@@ -23,8 +32,8 @@ public class OthelloDriver {
 				}
 				System.out.print("あなた(" + othello.myCoin + ")の番です: ");
 				int n = sc.nextInt();
-				int i = n / 8; // HACK: 本当は定数を使うべき
-				int j = n % 8;
+				int i = n / Board.BOARD_LENGTH;
+				int j = n % Board.BOARD_LENGTH;
 				if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
 					System.out.println("不適切な入力");
 					tern--;
@@ -55,8 +64,8 @@ public class OthelloDriver {
 
 				System.out.print("あいて(" + othello.opponentCoin + ")の番です: ");
 				int n = sc.nextInt();
-				int i = n / 8; // HACK: 本当は定数を使うべき
-				int j = n % 8;
+				int i = n / Board.BOARD_LENGTH;
+				int j = n % Board.BOARD_LENGTH;
 				if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
 					System.out.println("不適切な入力");
 					tern--;

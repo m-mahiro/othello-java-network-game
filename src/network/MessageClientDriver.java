@@ -1,9 +1,8 @@
-package controller;
+package network;
 
-import network.MessageClient;
 import java.util.*;
 
-public class MessageSendDriver {
+public class MessageClientDriver {
 
 	public static void main(String[] args) {
 		MessageClient messageClient = new MessageClient("localhost", 10000);

@@ -1,11 +1,11 @@
-package domain;
+package model;
 
 public enum Coin implements Cloneable {
 	BLACK('○'),
 	WHITE('●'),
 	NONE('-');
 
-	private char marker;
+	private final char marker;
 
 	Coin(char marker) {
 		this.marker = marker;

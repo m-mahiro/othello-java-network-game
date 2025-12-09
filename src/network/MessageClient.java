@@ -7,12 +7,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class MessageClient extends Thread {
+public class MessageClient {
 
 	private BufferedReader in;
 	private PrintWriter out;
 	private int address;
-	private int threadCount = 0;
 	private String host;
 	private int port;
 
@@ -31,13 +30,10 @@ public class MessageClient extends Thread {
 			this.address = Integer.parseInt(in.readLine());
 			log("()", "Address Config Done! (address: " + this.address + ")");
 
-			// メッセージの受け取りを開始
-			this.start();
-
 		} catch (UnknownHostException e) {
-			log("()","ホストのIPアドレスが判定できません。: " + e);
+			log("()", "ホストのIPアドレスが判定できません。: " + e);
 		} catch (IOException e) {
-			log("()" ,"エラーが発生しました。" + e);
+			log("()", "エラーが発生しました。" + e);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -48,41 +44,36 @@ public class MessageClient extends Thread {
 		transport(packet);
 	}
 
-	public void send(int destination, String message) {
+	public void send(String message, int destination) {
 		Packet packet = new Packet(this.address, destination, message);
 		transport(packet);
 	}
 
-	@Override
-	public void run() {
+	public void sendToServer(String message) {
+		Packet packet = new Packet(this.address, Packet.SERVER_ADDRESS, message);
+		transport(packet);
+	}
+
+	public String nextMessage() {
 		// クライアント一つにつき、1つのスレッドである必要がある
-		threadCount++;
-		if (threadCount > 1) throw new RuntimeException("2つ以上のスレッドは開始できません。");
-
 		try {
-			// この処理を関数化してはいけない。run()以外でメッセージを受け取ることを想定していないから。
-			String body;
-			while (true) {
-
-				// 文字列を受信する
-				String packetString = in.readLine();
-				if (packetString == null) {
-					log("run", "ファイルストリームの最後に達しました。スレッドを終了します。");
-					break; // todo: ここはExceptionを吐くべき?
-				}
-
-				// Packetオブジェクト化
-				if (packetString.contains("\n")) throw new RuntimeException("受信内容に改行文字が含まれていました。");
-				Packet packet = new Packet(packetString);
-
-				// bodyを取得
-				body = packet.getBody();
-				log("run" ,"Fetched: " + body);
+			// 文字列を受信する
+			String packetString = in.readLine();
+			log("nextMessage", "packetString: " + packetString);
+			if (packetString == null) {
+				throw new RuntimeException("ファイルストリームの最後に達しました。");
 			}
 
+			// Packetオブジェクト化
+			if (packetString.contains("\n")) throw new RuntimeException("受信内容に改行文字が含まれていました。");
+			Packet packet = new Packet(packetString);
+
+			// bodyを取得
+			String body = packet.getBody();
+			log("nextMessage", "Fetched: " + body);
+			return body;
+
 		} catch (IOException e) {
-			log("run" ,e.getMessage());
-		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -97,11 +88,11 @@ public class MessageClient extends Thread {
 		return this.address;
 	}
 
-	String getHost() {
+	public String getHost() {
 		return this.host;
 	}
 
-	int getPort() {
+	public int getPort() {
 		return this.port;
 	}
 
@@ -112,7 +103,7 @@ public class MessageClient extends Thread {
 		if (message.contains("\n")) throw new RuntimeException("送信内容に改行文字を入れてはいけません。");
 		out.println(message);
 		out.flush();
-		log("transport" , packet.format());
+		log("transport", packet.format());
 	}
 
 	private void log(String method, String string) {

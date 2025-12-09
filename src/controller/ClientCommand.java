@@ -1,56 +1,150 @@
 package controller;
 
-import domain.Othello;
+import model.Coin;
+
+import java.util.Arrays;
 
 class ClientCommand {
 
-	Othello othello;
-	ClientCommandType type;
-	String commandString;
+	final Type type; // SMELL: フィールドがパブリック(finalだからまだセーフ？)
+	private final String[] arguments;
 
-	// todo: エラーハンドリングがばがば
-	ClientCommand(Othello othello, String message) {
+	// hack: エラーハンドリングがばがば
+	ClientCommand(String commandString) {
+		String[] array = commandString.split(" ");
+		Type type = Type.valueOf(array[0]);
+		String[] args = Arrays.copyOfRange(array, 1, array.length);
+		this.type = type;
+		this.arguments = args;
+	}
 
-		this.othello = othello;
-		this.type = ClientCommandType.valueOf(message.split(" ")[0]);
+	// hack: エラーハンドリングがばがば
+	private ClientCommand(Type type, String[] arguments) {
+		this.type = type;
+		this.arguments = arguments;
+	}
 
-		// type以降のトークンは全て一つの文字列として扱う
-		char[] arr = message.toCharArray();
-		for (int i = 0; i < message.length(); i++) {
-			char c = arr[i];
-			if (c == ' ') this.commandString = message.substring(i + 1);
+	String format() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.type.toString());
+		for (String arg : this.arguments) {
+			sb.append(" ");
+			sb.append(arg);
+		}
+		return sb.toString();
+	}
+
+	void executeOn(OthelloClient othelloClient) {
+		type.execute(othelloClient, this.arguments);
+	}
+
+
+	// ============================= ClientCommandインスタンスを作成するメソッド群 =============================
+
+	static ClientCommand playWith(int address, String name, Coin coin) {
+		ClientCommand.Type type = ClientCommand.Type.PLAY_WITH;
+		String[] args = {Integer.toString(address), name, coin.name()};
+		return new ClientCommand(type, args);
+	}
+
+	static ClientCommand putCoin(int i, int j) {
+		ClientCommand.Type type = ClientCommand.Type.PUT_COIN;
+		String[] args = {Integer.toString(i), Integer.toString(j)};
+		return new ClientCommand(type, args);
+	}
+
+	static ClientCommand revert() {
+		ClientCommand.Type type = ClientCommand.Type.REVERT;
+		String[] arg = {};
+		return new ClientCommand(type, arg);
+	}
+
+	static ClientCommand restart() {
+		ClientCommand.Type type = ClientCommand.Type.RESTART;
+		String[] arg = {};
+		return new ClientCommand(type, arg);
+	}
+
+
+	// ============================= デバッグ用 =============================
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[ClientCommand()] " + string);
+		} else {
+			System.out.println("[ClientCommand" + method + "()] " + string);
 		}
 	}
 
-	public void execute() {
-		type.execute(this.othello, this.commandString);
-	}
-
-	public static String putCoin(int i, int j) {
-		String str = "";
-		str += i + " ";
-		str += j + " ";
-		return str;
-	}
-
-
 	// ========================================== インナークラス ================================================
-	// インナークラスである必要がある理由:
-	//     このクラスはClientCommandからしかアクセスできてはいけないから。
-	//     インナークラスにした方がパッケージの構造がシンプルになるから。
-	// ClientCommandからしかアクセスで来てはいけない理由:
-	//     単純に想定していないから。
+	// NOTE: Typeクラスのexecute()へは、ClientCommandからしかアクセスされたくない。
 	// =======================================================================================================
-	private enum ClientCommandType {
+	private enum Type {
+
+		PLAY_WITH {
+			@Override
+			void execute(OthelloClient serverClient, String[] args) {
+				int address = Integer.parseInt(args[0]);
+				String name = args[1];
+				Coin coin = Coin.valueOf(args[2]);
+				log("execute", "相手が見つかりました！ (address: " + address + ", coin: " + coin + ")");
+			}
+
+			@Override
+			int getArgumentSize() {
+				return 3;
+			}
+		},
 
 		PUT_COIN {
 			@Override
-			void execute(Othello othello, String commandString) {
-				// todo: 未実装
+			void execute(OthelloClient serverClient, String[] args) {
+				int i = Integer.parseInt(args[0]);
+				int j = Integer.parseInt(args[1]);
+				log("execute", "コインを置こう!(i: " + i + ", j:" + j + ")");
+			}
+
+			@Override
+			int getArgumentSize() {
+				return 2;
+			}
+		},
+
+		REVERT {
+			@Override
+			void execute(OthelloClient serverClient, String[] args) {
+				log("execute", "一個戻そう");
+			}
+
+			@Override
+			int getArgumentSize() {
+				return 0;
+			}
+		},
+
+		RESTART {
+			@Override
+			void execute(OthelloClient serverClient, String[] args) {
+				log("execute", "再スタートしよう!");
+			}
+
+			@Override
+			int getArgumentSize() {
+				return 0;
 			}
 		};
 
-		abstract void execute(Othello othello, String commandString);
+		abstract void execute(OthelloClient serverClient, String[] arguments);
+
+		abstract int getArgumentSize();
+
+		// ============================= デバッグ用 =============================
+		private static void log(String method, String string) {
+			if (method.equals("()")) {
+				System.out.println("[ClientCommand.Type()] " + string);
+			} else {
+				System.out.println("[ClientCommand.Type" + method + "()] " + string);
+			}
+		}
 
 	}
 

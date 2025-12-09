@@ -38,6 +38,7 @@ public class MessageServer extends Thread {
 		this.forward(packet);
 	}
 
+
 	public void broadcast(String message) {
 		Packet packet = new Packet(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS, message);
 		this.forward(packet);
@@ -48,7 +49,6 @@ public class MessageServer extends Thread {
 	}
 
 
-	@Override
 	public void run() {
 		// クライアントの受付を開始
 		int address = Math.max(Packet.SERVER_ADDRESS, Packet.BROADCAST_ADDRESS);
@@ -79,7 +79,7 @@ public class MessageServer extends Thread {
 		}
 	}
 
-	// todo: final()でソケットをクローズする
+	// TODO: final()でソケットをクローズする
 
 	// ================== プライベートメソッド ==================
 	private void terminateClientProcess(ClientProcessThread client, Exception e) {
@@ -87,7 +87,7 @@ public class MessageServer extends Thread {
 		clients.remove(client.getAddress());
 	}
 
-	// todo: これ関数化する必要ある?
+	// REVIEW: これ関数化する必要ある?
 	private void registerClient(ClientProcessThread client) {
 		MessageServer.this.clients.put(client.getAddress(), client);
 	}
@@ -110,11 +110,25 @@ public class MessageServer extends Thread {
 
 			// ユニキャスト
 			default:
-				ClientProcessThread client = clients.get(packet.destination);
+				int targetAddress = packet.destination;
+				if (!clients.containsKey(targetAddress)) {
+					throw new RuntimeException("アドレス" + targetAddress + "は見つかりませんでした。\n現在存在しているアドレス: " + clients.toString()); // todo: MessageServerExceptionを実装
+				}
+				ClientProcessThread client = clients.get(targetAddress);
 				client.push(packet);
 				break;
 		}
 	}
+
+	// ================== デバッグ用 ==================
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[MessageServer()] " + string);
+		} else {
+			System.out.println("[MessageServer." + method + "()] " + string);
+		}
+	}
+
 
 
 	// ========================================== インナークラス ================================================
@@ -161,7 +175,8 @@ public class MessageServer extends Thread {
 
 			} catch (IOException e) {
 				MessageServer.this.terminateClientProcess(this, e);
-				throw new RuntimeException(e); // todo: ちゃんと定義したExceptionを使わないといけない
+//				throw new RuntimeException(e); // todo: ちゃんと定義したExceptionを使わないといけない
+				e.printStackTrace();
 			}
 		}
 
@@ -188,14 +203,4 @@ public class MessageServer extends Thread {
 
 		}
 	}
-
-	// ================== プライベートメソッド ==================
-	private void log(String method, String string) {
-		if (method.equals("()")) {
-			System.out.println("[MessageServer()] " + string);
-		} else {
-			System.out.println("[MessageServer." + method + "()] " + string);
-		}
-	}
-
 }

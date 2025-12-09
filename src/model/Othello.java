@@ -1,4 +1,4 @@
-package domain;
+package model;
 
 import java.util.Stack;
 
@@ -20,7 +20,6 @@ public class Othello {
 		}
 		this.opponentCoin = opponentCoin;
 		this.board = new Board();
-		this.history.add(this.board.clone());
 	}
 
 
@@ -30,16 +29,16 @@ public class Othello {
 		if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
 			throw new IllegalArgumentException("Both argument must be [0," + Board.BOARD_LENGTH + "] (Given i: " + i + ", j: " + j + ")");
 		}
+		this.history.push(this.board.clone());
 		this.board.putCoin(myCoin, i, j);
-		this.history.push(this.board);
 	}
 
 	public void putOpponent(int i, int j) throws OthelloDomainException {
 		if (!(0 <= i && i < Board.BOARD_LENGTH && 0 <= j && j < Board.BOARD_LENGTH)) {
 			throw new IllegalArgumentException("Both argument must be [0," + Board.BOARD_LENGTH + "] (Given i: " + i + ", j: " + j + ")");
 		}
+		this.history.push(this.board.clone());
 		board.putCoin(opponentCoin, i, j);
-		this.history.push(this.board);
 	}
 
 	public void restart() {
@@ -51,6 +50,7 @@ public class Othello {
 		this.board = history.pop();
 	}
 
+
 	// ============================= ボードの状態を確認する系のメソッド =============================
 
 	public Coin getWinner() throws OthelloDomainException {
@@ -58,8 +58,8 @@ public class Othello {
 		if (!isFinish()) throw OthelloDomainException.isNotFinished();
 		int black = 0;
 		int white = 0;
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
+		for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+			for (int j = 0; j < Board.BOARD_LENGTH; j++) {
 				Coin coin = this.board.getCoin(i, j);
 				switch (coin) {
 					case WHITE: white++;

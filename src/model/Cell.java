@@ -1,4 +1,4 @@
-package domain;
+package model;
 
 // パッケージプライベート
 // review: パッケージプライベートにするぐらいだったら、Boardからしか使われていないのだからBoardのインナークラスにしたらどうなの?
@@ -17,11 +17,11 @@ class Cell implements Cloneable {
 	}
 
 	public void putCoin(Coin coin) throws OthelloDomainException {
-		if (this.hasCoin()) throw OthelloDomainException.alreadyExistsCoin();
+		if (this.cannotPut()) throw OthelloDomainException.alreadyExistsCoin();
 		this.coin = coin;
 	}
 
-	public boolean hasCoin() {
+	public boolean cannotPut() {
 		return coin != Coin.NONE;
 	}
 
@@ -31,18 +31,15 @@ class Cell implements Cloneable {
 
 	@Override
 	public String toString() {
-		switch (this.coin) {
-			case WHITE: return "黒";
-			case BLACK: return "白";
-			case NONE: return " ";
-			default: throw new AssertionError();
-		}
+		return this.coin.toString();
 	}
 
 	@Override
 	public Cell clone() {
 		try {
-			return (Cell) super.clone();
+			Cell clone = (Cell) super.clone();
+			clone.coin = this.coin;
+			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError(e);
 		}
