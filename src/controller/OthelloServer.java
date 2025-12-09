@@ -1,11 +1,11 @@
 package controller;
 
-import network.MessageServer;
+import model.Coin;
+import java.util.Scanner;
 
 public class OthelloServer extends Thread {
 
 	private final ServerCommandIO serverCommandIO;
-
 	public OthelloServer() {
 		this.serverCommandIO = new ServerCommandIO();
 		CommandReceiveThread thread = new CommandReceiveThread();
@@ -14,7 +14,17 @@ public class OthelloServer extends Thread {
 
 	@Override
 	public void run() {
+		Scanner sc = new Scanner(System.in);
+		sc.nextInt();
+		ClientCommander clientCommander = new ClientCommander(this.serverCommandIO, 1);
 
+		clientCommander.playWith(2, "すばる", Coin.BLACK);
+		clientCommander.putCoin(1, 1);
+		clientCommander.restart();
+		clientCommander.revert();
+
+
+		while(true) {}
 	}
 
 	// ============================= インナークラス =============================
@@ -24,9 +34,11 @@ public class OthelloServer extends Thread {
 	private class CommandReceiveThread extends Thread {
 		@Override
 		public void run() {
-			ServerCommand command = serverCommandIO.nextServerCommand();
-			log("run", command.format());
-//			command.executeOn(OthelloServer.this);
+			while(true) {
+				ServerCommand command = serverCommandIO.nextServerCommand();
+				log("run", command.format());
+				command.executeOn(OthelloServer.this);
+			}
 		}
 	}
 

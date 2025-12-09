@@ -1,5 +1,7 @@
 package controller;
 
+import model.Coin;
+
 import java.util.Arrays;
 
 class ClientCommand {
@@ -39,9 +41,9 @@ class ClientCommand {
 
 	// ============================= ClientCommandインスタンスを作成するメソッド群 =============================
 
-	static ClientCommand playWith(int address, String name) {
+	static ClientCommand playWith(int address, String name, Coin coin) {
 		ClientCommand.Type type = ClientCommand.Type.PLAY_WITH;
-		String[] args = {Integer.toString(address), name};
+		String[] args = {Integer.toString(address), name, coin.name()};
 		return new ClientCommand(type, args);
 	}
 
@@ -79,33 +81,38 @@ class ClientCommand {
 	private enum Type {
 
 		PLAY_WITH {
-			// REVIEW: 名前がおかしきがする。
-			// サーバからこのコマンドを受け取ることで、対戦相手の通知を受ける。
 			@Override
 			void execute(OthelloClient serverClient, String[] args) {
-				// TODO:
+				int address = Integer.parseInt(args[0]);
+				String name = args[1];
+				Coin coin = Coin.valueOf(args[2]);
+				log("execute", "相手が見つかりました！ (address: " + address + ", coin: " + coin + ")");
 			}
 
 			@Override
 			int getArgumentSize() {
-				return 0;
+				return 3;
 			}
 		},
+
 		PUT_COIN {
 			@Override
 			void execute(OthelloClient serverClient, String[] args) {
-				log("execute", "実行されました!");
+				int i = Integer.parseInt(args[0]);
+				int j = Integer.parseInt(args[1]);
+				log("execute", "コインを置こう!(i: " + i + ", j:" + j + ")");
 			}
 
 			@Override
 			int getArgumentSize() {
-				return 0;
+				return 2;
 			}
 		},
+
 		REVERT {
 			@Override
 			void execute(OthelloClient serverClient, String[] args) {
-
+				log("execute", "一個戻そう");
 			}
 
 			@Override
@@ -113,10 +120,11 @@ class ClientCommand {
 				return 0;
 			}
 		},
+
 		RESTART {
 			@Override
 			void execute(OthelloClient serverClient, String[] args) {
-
+				log("execute", "再スタートしよう!");
 			}
 
 			@Override
@@ -128,7 +136,6 @@ class ClientCommand {
 		abstract void execute(OthelloClient serverClient, String[] arguments);
 
 		abstract int getArgumentSize();
-
 
 		// ============================= デバッグ用 =============================
 		private static void log(String method, String string) {

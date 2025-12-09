@@ -25,11 +25,11 @@ public class OthelloClient extends Thread {
 	public void run() {
 		// ここにオセロゲームのメインスレッドを記述
 
-		this.serverCommander = new ServerCommander(this.clientCommandIO);
+		serverCommander = new ServerCommander(this.clientCommandIO);
+		serverCommander.registerClient("test-user");
+		serverCommander.searchOpponent();
 
-
-
-//		(new Scanner(System.in)).nextInt();
+		while (true) {}
 	}
 
 	// ============================= ゲッター/セッター =============================
@@ -55,9 +55,11 @@ public class OthelloClient extends Thread {
 	private class CommandReceiveThread extends Thread {
 		@Override
 		public void run() {
-			ClientCommand command = clientCommandIO.nextClientCommand();
-			log("run", command.format());
-			command.executeOn(OthelloClient.this);
+			while (true) {
+				ClientCommand command = clientCommandIO.nextClientCommand();
+				log("run", command.format());
+				command.executeOn(OthelloClient.this);
+			}
 		}
 
 		// ============================= デバッグ用 =============================

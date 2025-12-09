@@ -14,6 +14,7 @@ class ServerCommandIO extends Thread {
 
 	ServerCommandIO() {
 		this.messageServer = new MessageServer(10000, 100);
+		this.start();
 	}
 
 	ServerCommand nextServerCommand() {
@@ -25,21 +26,23 @@ class ServerCommandIO extends Thread {
 	}
 
 	void push(ClientCommand clientCommand, int clientAddress) {
-		this.messageServer.send(clientCommand.format(), clientAddress);
+		String message = CommandHeader.CLIENT_COMMAND + " " + clientCommand.format();
+		this.messageServer.send(message, clientAddress);
 	}
 
 
 	@Override
 	public void run() {
 
-		String message = messageServer.nextMessage();
-		if (message.startsWith(CommandHeader.SERVER_COMMAND.toString())) {
-			String commandString = message.substring(CommandHeader.SERVER_COMMAND.toString().length() + 1);
-			ServerCommand command = new ServerCommand(commandString);
-			this.serverCommandQueue.add(command);
-
-		} else {
-			throw new AssertionError();
+		while (true) {
+			String message = messageServer.nextMessage();
+			if (message.startsWith(CommandHeader.SERVER_COMMAND.toString())) {
+				String commandString = message.substring(CommandHeader.SERVER_COMMAND.toString().length() + 1);
+				ServerCommand command = new ServerCommand(commandString);
+				this.serverCommandQueue.add(command);
+			} else {
+				throw new AssertionError();
+			}
 		}
 	}
 

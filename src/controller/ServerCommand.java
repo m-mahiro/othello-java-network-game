@@ -10,7 +10,12 @@ class ServerCommand {
 	// hack: エラーハンドリングがばがば
 	ServerCommand(String commandString) {
 		String[] array = commandString.split(" ");
-		Type type = Type.valueOf(array[0]);
+		Type type;
+		try {
+			type = Type.valueOf(array[0]);
+		} catch (IllegalArgumentException e) {
+			throw CommandException.invalidCommandFormat(commandString);
+		}
 		String[] args = Arrays.copyOfRange(array, 1, array.length);
 		this.type = type;
 		this.arguments = args;
@@ -52,26 +57,50 @@ class ServerCommand {
 
 
 
-	// ========================================== インナークラス ================================================
+	// ========================================== プライベートインナークラス ================================================
 	// NOTE: Typeクラスのexecute()へは、ServerCommandクラスからしかアクセスされたくない。
 	// 外部にexecute()を公開してしまうと、String[] argumentsの知識を前提に使わせることになるから危ない。
 	// =======================================================================================================
-	enum Type {
+	private enum Type {
 
 		REGISTER_CLIENT {
 			@Override
-			void execute(OthelloServer othelloServer, String[] arguments) {
+			void execute(OthelloServer othelloServer, String[] args) {
+				int address = Integer.parseInt(args[0]);
+				String name = args[1];
+				log("execute", "登録完了! (address: " + address + ", name" + name + ")");
+			}
 
+			@Override
+			int getArgumentSize() {
+				return 2;
 			}
 		},
 		SEARCH_OPPONENT {
 			@Override
-			void execute(OthelloServer othelloServer, String[] arguments) {
+			void execute(OthelloServer othelloServer, String[] args) {
+				log("execute", "今から対戦相手を探します！");
+			}
 
+			@Override
+			int getArgumentSize() {
+				return 0;
 			}
 		};
 
 		abstract void execute(OthelloServer othelloServer, String[] arguments);
+
+		abstract int getArgumentSize();
+
+		// ============================= デバッグ用 =============================
+		private static void log(String method, String string) {
+			if (method.equals("()")) {
+				System.out.println("[ServerCommand.Type()] " + string);
+			} else {
+				System.out.println("[ServerCommand.Type" + method + "()] " + string);
+			}
+		}
+
 	}
 
 }

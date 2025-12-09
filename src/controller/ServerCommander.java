@@ -10,7 +10,10 @@ class ServerCommander {
 		this.clientCommandIO = clientCommandIO;
 	}
 
-	void registerClient(int address, String name) {
+
+	// ============================= コマンドを発行するメソッド群 =============================
+	void registerClient(String name) {
+		int address = clientCommandIO.getAddress();
 		ServerCommand command = ServerCommand.registerClient(address, name);
 		this.issue(command);
 	}
@@ -20,6 +23,7 @@ class ServerCommander {
 		this.issue(command);
 	}
 
+	// ============================= プライベートメソッド =============================
 	private void issue(ServerCommand command) {
 		clientCommandIO.push(command);
 	}

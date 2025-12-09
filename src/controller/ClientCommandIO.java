@@ -29,20 +29,23 @@ class ClientCommandIO extends Thread {
 	}
 
 	void push(ServerCommand serverCommand) {
-		String message = CommandHeader.SERVER_COMMAND.toString() + serverCommand.format();
+		String message = CommandHeader.SERVER_COMMAND + " " + serverCommand.format();
 		this.messageClient.sendToServer(message);
+	}
+
+	int getAddress() {
+		return this.messageClient.getAddress();
 	}
 
 	@Override
 	public void run() {
-
 		while (true) {
 			String message = messageClient.nextMessage();
 			log("run", "message: " + message);
 			if (! message.startsWith(CommandHeader.CLIENT_COMMAND.toString())) {
 				throw CommandException.invalidMessageFormat(message);
 			}
-			String commandString = message.substring(CommandHeader.CLIENT_COMMAND.toString().length());
+			String commandString = message.substring(CommandHeader.CLIENT_COMMAND.toString().length() + 1);
 			log("run", "commandString: " + commandString);
 			ClientCommand command = new ClientCommand(commandString);
 			this.clientCommandQueue.add(command);
@@ -56,7 +59,7 @@ class ClientCommandIO extends Thread {
 		if (method.equals("()")) {
 			System.out.println("[ClientCommandIO()] " + string);
 		} else {
-			System.out.println("[ClientCommandIO" + method + "()] " + string);
+			System.out.println("[ClientCommandIO." + method + "()] " + string);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package controller;
 
+import model.Coin;
 import network.MessageClient;
 import network.MessageServer;
 
@@ -13,8 +14,10 @@ class ClientCommander {
 		this.opponentAddress = opponentAddress;
 	}
 
-	void playWith(int address, String name) {
-		ClientCommand command = ClientCommand.playWith(address, name);
+
+	// ============================= コマンドを発行するメソッド群 =============================
+	void playWith(int address, String name, Coin coin) {
+		ClientCommand command = ClientCommand.playWith(address, name, coin);
 		this.issue(command);
 	}
 
@@ -33,6 +36,7 @@ class ClientCommander {
 		this.issue(command);
 	}
 
+	// ============================= プライベートメソッド =============================
 	private void issue(ClientCommand command) {
 		serverCommandIO.push(command, opponentAddress);
 	}
