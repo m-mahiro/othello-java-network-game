@@ -5,10 +5,10 @@ class Packet {
 	// パッケージプライベート
 	// SMELL: プライベートではないフィールド
 	static final int SERVER_ADDRESS = 0;
-	private final int source;
+	static final int BROADCAST_ADDRESS = -1;
+	final int source;
 	final int destination;
 	final String body;
-	static final int BROADCAST_ADDRESS = -1;
 
 	// プライベート
 	private static final int HEADER_SIZE = 2;

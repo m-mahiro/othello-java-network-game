@@ -6,15 +6,14 @@ import network.MessageClient;
 
 public class OthelloClient extends Thread {
 
-	private final MessageClient messageClient; // SMELL: レイヤーとばしてる。折角CommandIOで隠ぺいしたのに。
 	private final ClientCommandIO clientCommandIO;
 	private final Othello othello;
+	private ServerCommander serverCommander;
 
-	public OthelloClient(MessageClient messageClient) {
+	public OthelloClient() {
 
 		// 初期化
-		this.messageClient = messageClient;
-		this.clientCommandIO = new ClientCommandIO(messageClient);
+		this.clientCommandIO = new ClientCommandIO();
 		this.othello = new Othello(Coin.BLACK);
 
 		// メインロジックは別スレッドで
@@ -26,7 +25,7 @@ public class OthelloClient extends Thread {
 	public void run() {
 		// ここにオセロゲームのメインスレッドを記述
 
-		ServerCommander serverCommander = new ServerCommander(messageClient);
+		this.serverCommander = new ServerCommander(this.clientCommandIO);
 
 
 

@@ -6,8 +6,8 @@ class ServerCommander {
 
 	private final ClientCommandIO clientCommandIO;
 
-	ServerCommander(MessageClient messageClient) {
-		this.clientCommandIO = new ClientCommandIO(messageClient);
+	ServerCommander(ClientCommandIO clientCommandIO) {
+		this.clientCommandIO = clientCommandIO;
 	}
 
 	void registerClient(int address, String name) {

@@ -6,12 +6,16 @@ public class OthelloServer extends Thread {
 
 	private final ServerCommandIO serverCommandIO;
 
-	public OthelloServer(MessageServer messageServer) {
-		this.serverCommandIO = new ServerCommandIO(messageServer);
+	public OthelloServer() {
+		this.serverCommandIO = new ServerCommandIO();
 		CommandReceiveThread thread = new CommandReceiveThread();
 		thread.start();
 	}
 
+	@Override
+	public void run() {
+
+	}
 
 	// ============================= インナークラス =============================
 	// NOTE: なぜインナークラスなのか？

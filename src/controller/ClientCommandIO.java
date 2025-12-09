@@ -12,10 +12,9 @@ class ClientCommandIO extends Thread {
 	// NOTE: 排他制御は必要ないけど、取り出すときに空なら追加されるまで待つという特性が便利だからつかう。
 	private final BlockingQueue<ClientCommand> clientCommandQueue = new LinkedBlockingQueue<>();
 
-	ClientCommandIO(MessageClient messageClient) {
-		this.messageClient = messageClient;
+	ClientCommandIO() {
+		this.messageClient = new MessageClient("localhost", 10000);
 		this.start();
-		// REVIEW: コンストラクタ内でMessageClientをnewするよりも、引数で受け取った方が良い。けどうまく言語化できない。
 	}
 
 	ClientCommand nextClientCommand() {
@@ -27,11 +26,6 @@ class ClientCommandIO extends Thread {
 		} catch (InterruptedException e) {
 			throw new RuntimeException("クライアントコマンドをキューから取り出す際に割込みが発生しました。");
 		}
-	}
-
-	void push(ClientCommand clientCommand, int clientAddress) {
-		String message = CommandHeader.CLIENT_COMMAND.toString() + clientCommand.format();
-		this.messageClient.send(message, clientAddress);
 	}
 
 	void push(ServerCommand serverCommand) {

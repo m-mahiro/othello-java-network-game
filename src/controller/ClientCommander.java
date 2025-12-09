@@ -1,14 +1,15 @@
 package controller;
 
 import network.MessageClient;
+import network.MessageServer;
 
 class ClientCommander {
 
-	private final ClientCommandIO clientCommandIO;
+	private final ServerCommandIO serverCommandIO;
 	private final int opponentAddress;
 
-	ClientCommander(MessageClient messageClient, int opponentAddress) {
-		this.clientCommandIO = new ClientCommandIO(messageClient);
+	ClientCommander(ServerCommandIO serverCommandIO, int opponentAddress) {
+		this.serverCommandIO = serverCommandIO;
 		this.opponentAddress = opponentAddress;
 	}
 
@@ -33,7 +34,7 @@ class ClientCommander {
 	}
 
 	private void issue(ClientCommand command) {
-		clientCommandIO.push(command, opponentAddress);
+		serverCommandIO.push(command, opponentAddress);
 	}
 }
 
