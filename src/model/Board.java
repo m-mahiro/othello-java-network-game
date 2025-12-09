@@ -49,7 +49,7 @@ public class Board implements Cloneable {
 		}
 
 		// すでにコインが置いてある場所にはもちろんコインを置けない。
-		if (this.cells[i][j].hasCoin()) return false;
+		if (this.cells[i][j].cannotPut()) return false;
 
 		// オセロで1枚以上コインをひっくりかえせる場所にしか、コインを新たに置けない。
 		try {
@@ -130,7 +130,7 @@ public class Board implements Cloneable {
 		// エラーハンドリング
 		if (myCoin == Coin.NONE) throw new IllegalArgumentException("NONEはだめ");
 		if (!(0 <= i && i < BOARD_LENGTH && 0 <= j && j < BOARD_LENGTH)) throw new IllegalArgumentException("Both argument must be [0, " + BOARD_LENGTH +"] (Given i: " + i + ", j: " + j + ")");
-		if (cells[i][j].hasCoin()) throw OthelloDomainException.alreadyExistsCoin();
+		if (cells[i][j].cannotPut()) throw OthelloDomainException.alreadyExistsCoin();
 
 		// 宣言
 		ArrayList<Cell> flippableCells = new ArrayList<>(); // 最終的にひっくりかえせるセル
@@ -142,7 +142,7 @@ public class Board implements Cloneable {
 		}
 
 		// 上下左右斜めの8方向それぞれについて、ひっくりかえせるコインを探す
-		for (int direction = 0; direction < BOARD_LENGTH; direction++) {
+		for (int direction = 0; direction < 8; direction++) {
 
 			// ひっくりかえせるかもしれないコインの集合
 			HashSet<Cell> cells = new HashSet<>();

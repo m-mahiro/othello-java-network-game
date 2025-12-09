@@ -58,8 +58,8 @@ public class Othello {
 		if (!isFinish()) throw OthelloDomainException.isNotFinished();
 		int black = 0;
 		int white = 0;
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
+		for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+			for (int j = 0; j < Board.BOARD_LENGTH; j++) {
 				Coin coin = this.board.getCoin(i, j);
 				switch (coin) {
 					case WHITE: white++;

@@ -17,11 +17,11 @@ class Cell implements Cloneable {
 	}
 
 	public void putCoin(Coin coin) throws OthelloDomainException {
-		if (this.hasCoin()) throw OthelloDomainException.alreadyExistsCoin();
+		if (this.cannotPut()) throw OthelloDomainException.alreadyExistsCoin();
 		this.coin = coin;
 	}
 
-	public boolean hasCoin() {
+	public boolean cannotPut() {
 		return coin != Coin.NONE;
 	}
 
