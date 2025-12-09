@@ -35,8 +35,8 @@ class ServerCommandIO extends Thread{
 	public void run() {
 
 		String message = messageServer.nextMessage();
-		if (message.startsWith(Command.SERVER_COMMAND.toString())) {
-			String commandString = message.substring(Command.SERVER_COMMAND.toString().length() + 1);
+		if (message.startsWith(CommandHeader.SERVER_COMMAND.toString())) {
+			String commandString = message.substring(CommandHeader.SERVER_COMMAND.toString().length() + 1);
 			ServerCommand command = new ServerCommand(commandString);
 			this.serverCommandQueue.add(command);
 

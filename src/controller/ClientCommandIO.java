@@ -14,20 +14,16 @@ class ClientCommandIO extends Thread {
 
 	ClientCommandIO(MessageClient messageClient) {
 		this.messageClient = messageClient;
-//		this.messageClient = new MessageClient("localhost", 10000); // REVIEW: 引数で受け取った方が良い。けどうまく言語化できない。
-	}
-
-	void push(ClientCommand clientCommand, int clientAddress) {
-		this.messageClient.send(clientCommand.format(), clientAddress);
-	}
-
-	void push(ServerCommand serverCommand) {
-		this.messageClient.sendToServer(serverCommand.format());
+		this.start();
+		// REVIEW: コンストラクタ内でMessageClientをnewするよりも、引数で受け取った方が良い。けどうまく言語化できない。
 	}
 
 	ClientCommand nextClientCommand() {
+
 		try {
-			return this.clientCommandQueue.take();
+			ClientCommand command = this.clientCommandQueue.take();
+			log("nextClientCommand", command.format());
+			return command;
 		} catch (InterruptedException e) {
 			throw new RuntimeException("クライアントコマンドをキューから取り出す際に割込みが発生しました。");
 		}
@@ -38,15 +34,34 @@ class ClientCommandIO extends Thread {
 
 		while (true) {
 			String message = messageClient.nextMessage();
-			if (! message.startsWith(Command.CLIENT_COMMAND.toString())) {
-				throw new AssertionError();
+			log("run", "message: " + message);
+			if (! message.startsWith(CommandHeader.CLIENT_COMMAND.toString())) {
+				throw CommandException.invalidMessageFormat(message);
 			}
-			String commandString = message.substring(Command.CLIENT_COMMAND.toString().length() + 1);
+			String commandString = message.substring(CommandHeader.CLIENT_COMMAND.toString().length());
+			log("run", "commandString: " + commandString);
 			ClientCommand command = new ClientCommand(commandString);
 			this.clientCommandQueue.add(command);
 		}
+	}
 
+	void push(ClientCommand clientCommand, int clientAddress) {
+		String message = CommandHeader.CLIENT_COMMAND.toString() + clientCommand.format();
+		this.messageClient.send(message, clientAddress);
+	}
+
+	void push(ServerCommand serverCommand) {
+		String message = CommandHeader.SERVER_COMMAND.toString() + serverCommand.format();
+		this.messageClient.sendToServer(message);
 	}
 
 
+	// ============================= デバッグ用 =============================
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[ClientCommandIO()] " + string);
+		} else {
+			System.out.println("[ClientCommandIO" + method + "()] " + string);
+		}
+	}
 }

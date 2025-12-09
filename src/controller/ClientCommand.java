@@ -1,6 +1,9 @@
 package controller;
 
+import sun.rmi.runtime.Log;
+
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 class ClientCommand {
 
@@ -63,6 +66,14 @@ class ClientCommand {
 	}
 
 
+	// ============================= デバッグ用 =============================
+	private void log(String method, String string) {
+		if (method.equals("()")) {
+			System.out.println("[ClientCommand()] " + string);
+		} else {
+			System.out.println("[ClientCommand" + method + "()] " + string);
+		}
+	}
 
 	// ========================================== インナークラス ================================================
 	// NOTE: Typeクラスのexecute()へは、ClientCommandからしかアクセスされたくない。
@@ -85,7 +96,7 @@ class ClientCommand {
 		PUT_COIN {
 			@Override
 			void execute(OthelloClient serverClient, String[] args) {
-				// todo: 未実装
+				log("execute", "実行されました!");
 			}
 
 			@Override
@@ -119,6 +130,17 @@ class ClientCommand {
 		abstract void execute(OthelloClient serverClient, String[] arguments);
 
 		abstract int getArgumentSize();
+
+
+		// ============================= デバッグ用 =============================
+		private static void log(String method, String string) {
+			if (method.equals("()")) {
+				System.out.println("[ClientCommand.Type()] " + string);
+			} else {
+				System.out.println("[ClientCommand.Type" + method + "()] " + string);
+			}
+		}
+
 	}
 
 }

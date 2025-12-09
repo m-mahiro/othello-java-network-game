@@ -1,8 +1,10 @@
 import controller.OthelloClient;
 
-public class OthelloClientLauncher {
+// 受信のテスト
+public class OthelloClientLauncher1 {
 	public static void main(String[] args) {
 		OthelloClient othelloClient = new OthelloClient();
-		othelloClient.start();
+//		othelloClient.start();
+
 	}
 }

@@ -110,7 +110,11 @@ public class MessageServer extends Thread {
 
 			// ユニキャスト
 			default:
-				ClientProcessThread client = clients.get(packet.destination);
+				int targetAddress = packet.destination;
+				if (!clients.containsKey(targetAddress)) {
+					throw new RuntimeException("アドレス" + targetAddress + "は見つかりませんでした。\n現在存在しているアドレス: " + clients.toString()); // todo: MessageServerExceptionを実装
+				}
+				ClientProcessThread client = clients.get(targetAddress);
 				client.push(packet);
 				break;
 		}
@@ -171,7 +175,8 @@ public class MessageServer extends Thread {
 
 			} catch (IOException e) {
 				MessageServer.this.terminateClientProcess(this, e);
-				throw new RuntimeException(e); // todo: ちゃんと定義したExceptionを使わないといけない
+//				throw new RuntimeException(e); // todo: ちゃんと定義したExceptionを使わないといけない
+				e.printStackTrace();
 			}
 		}
 

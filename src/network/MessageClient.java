@@ -59,6 +59,7 @@ public class MessageClient {
 		try {
 			// 文字列を受信する
 			String packetString = in.readLine();
+			log("nextMessage", "packetString: " + packetString);
 			if (packetString == null) {
 				throw new RuntimeException("ファイルストリームの最後に達しました。");
 			}

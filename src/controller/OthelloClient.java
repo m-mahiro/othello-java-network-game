@@ -4,13 +4,16 @@ import model.Coin;
 import model.Othello;
 import network.MessageClient;
 
+import java.util.Scanner;
+
 public class OthelloClient extends Thread {
 
+	private final MessageClient messageClient; // SMELL: レイヤーとばしてる。折角CommandIOで隠ぺいしたのに。
 	private final ClientCommandIO clientCommandIO;
 	private final Othello othello;
 
 	public OthelloClient() {
-		MessageClient messageClient = new MessageClient("localhost", 10000);
+		this.messageClient = new MessageClient("localhost", 10000);
 		this.clientCommandIO = new ClientCommandIO(messageClient);
 		this.othello = new Othello(Coin.BLACK);
 		CommandReceiveThread thread = new CommandReceiveThread();
@@ -23,10 +26,18 @@ public class OthelloClient extends Thread {
 		// できればアクティビティごとにクラスを作成したいけど......絶対間に合わんくなるよな......
 
 		// こちらは送信
-		ClientCommander clientCommander = new ClientCommander(2);
+		ClientCommander clientCommander = new ClientCommander(this.messageClient, 1);
 		clientCommander.putCoin(1, 2);
+
+		Scanner sc = new Scanner(System.in);
+		sc.nextInt();
+
 	}
 
+	// ============================= ゲッター/セッター =============================
+	Othello getOthello() {
+		return this.othello;
+	}
 
 	// ============================= デバッグ用 =============================
 	private void log(String method, String string) {
@@ -38,17 +49,17 @@ public class OthelloClient extends Thread {
 	}
 
 
-
-	// ============================= インナークラス =============================
+	// ============================= プライベートインナークラス =============================
 	// NOTE: なぜインナークラスなのか？
 	//  OthelloClientでもスレッドを動かしたいから。
 	// ========================================================================
+
 	private class CommandReceiveThread extends Thread {
 		@Override
 		public void run() {
 			ClientCommand command = clientCommandIO.nextClientCommand();
 			log("run", command.format());
-//			command.executeOn(OthelloClient.this);
+			command.executeOn(OthelloClient.this);
 		}
 
 		// ============================= デバッグ用 =============================
